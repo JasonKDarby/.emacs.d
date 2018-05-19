@@ -5,11 +5,24 @@
 
 (package-initialize)
 
-(defvar my-packages '(better-defaults
-                      projectile
-                      clojure-mode
-                      cider
-                      rainbow-delimiters))
+(defvar my-packages
+  '(better-defaults
+    projectile
+    clojure-mode
+    cider
+    rainbow-delimiters
+    paredit
+    paredit-everywhere
+    company
+    magit
+    magit-filenotify
+    magit-find-file
+    counsel
+    counsel-projectile
+    ivy
+    ivy-pages
+    swiper
+    all-the-icons-ivy))
 
 (dolist (p my-packages)
   (unless (package-installed-p p)
@@ -61,20 +74,6 @@
 (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default default default italic underline success warning error])
- '(custom-enabled-themes (quote (tango-dark)))
- '(package-selected-packages
-   (quote
-    (paredit-everywhere paredit company magit magit-filenotify magit-find-file all-the-icons-ivy counsel counsel-projectile ivy ivy-pages swiper rainbow-delimiters projectile cider better-defaults autothemer))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(load-theme 'tango-dark t)
+
+(setq ansi-color-faces-vector [default default default italic underline success warning error])
