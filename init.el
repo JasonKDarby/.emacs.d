@@ -24,7 +24,8 @@
     swiper
     all-the-icons-ivy
     zoom
-    aggressive-indent))
+    aggressive-indent
+    powerline))
 
 (dolist (p my-packages)
   (unless (package-installed-p p)
@@ -42,7 +43,8 @@
     paredit-mode
     eldoc-mode
     zoom-mode
-    aggressive-indent-mode))
+    aggressive-indent-mode
+    projectile-mode))
 
 ;; Apply modes to mode-hooks
 (dolist (hook mode-hooks)
@@ -102,6 +104,7 @@
 (setq ansi-color-faces-vector [default default default italic underline success warning error])
 
 ;; https://stackoverflow.com/questions/145291/smart-home-in-emacs/145359
+;; TODO:  Make shift+beginning of line select passed over text.
 (defun smart-beginning-of-line ()
   "Move point to first non-whitespace character or beginning-of-line.
 
@@ -134,3 +137,7 @@ If point was already at that position, move point to beginning of line."
 
 ;; Prevent start screen
 (setq inhibit-startup-screen t)
+
+;; Sets the appearance of the bar that shows up at the bottom of buffers
+(require 'powerline)
+(powerline-center-theme)
