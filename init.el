@@ -22,7 +22,8 @@
     ivy
     ivy-pages
     swiper
-    all-the-icons-ivy))
+    all-the-icons-ivy
+    zoom))
 
 (dolist (p my-packages)
   (unless (package-installed-p p)
@@ -38,7 +39,8 @@
 (defvar modes
   '(rainbow-delimiters-mode
     paredit-mode
-    eldoc-mode))
+    eldoc-mode
+    zoom-mode))
 
 ;; Apply modes to mode-hooks
 (dolist (hook mode-hooks)
@@ -98,3 +100,36 @@
 
 ;; TODO:  What does this even do?  Find out and remove if unnecessary.
 (setq ansi-color-faces-vector [default default default italic underline success warning error])
+
+;; https://stackoverflow.com/questions/145291/smart-home-in-emacs/145359
+(defun smart-beginning-of-line ()
+  "Move point to first non-whitespace character or beginning-of-line.
+
+Move point to the first non-whitespace character on this line.
+If point was already at that position, move point to beginning of line."
+  (interactive)
+  (let ((oldpos (point)))
+    (back-to-indentation)
+    (and (= oldpos (point))
+         (beginning-of-line))))
+
+;; Set home for keyboards with home keys
+(global-set-key [home] 'smart-beginning-of-line)
+
+;; Set C-a because my macbook keyboard doesn't have easy home
+(global-set-key "\C-a" 'smart-beginning-of-line)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (zoom use-package rainbow-delimiters paredit-everywhere multiple-cursors magit-find-file magit-filenotify ivy-pages inflections hydra ensime edn counsel-projectile cider better-defaults autothemer all-the-icons-ivy))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
