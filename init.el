@@ -23,7 +23,8 @@
     ivy-pages
     swiper
     all-the-icons-ivy
-    zoom))
+    zoom
+    aggressive-indent))
 
 (dolist (p my-packages)
   (unless (package-installed-p p)
@@ -40,14 +41,13 @@
   '(rainbow-delimiters-mode
     paredit-mode
     eldoc-mode
-    zoom-mode))
+    zoom-mode
+    aggressive-indent-mode))
 
 ;; Apply modes to mode-hooks
 (dolist (hook mode-hooks)
   (dolist (mode modes)
     (add-hook hook mode)))
-
-(setq cider-font-lock-dynamically '(macro core function var))
 
 ;; Make the cursor a horizontal bar instead of the box
 (set-default 'cursor-type 'hbar)
@@ -119,23 +119,18 @@ If point was already at that position, move point to beginning of line."
 ;; Set C-a because my macbook keyboard doesn't have easy home
 (global-set-key "\C-a" 'smart-beginning-of-line)
 
+;; Set font, will probably need to update with fallback options
 (set-face-attribute 'default nil
-                    :family "Source Code Pro"
+                    :family "Source Code Pro Regular"
                     :height 110
                     :weight 'normal
                     :width 'normal)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (zoom use-package rainbow-delimiters paredit-everywhere multiple-cursors magit-find-file magit-filenotify ivy-pages inflections hydra ensime edn counsel-projectile cider better-defaults autothemer all-the-icons-ivy))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; Apply syntax highlighting to defined symbols
+(setq cider-font-lock-dynamically '(macro core function var))
+
+;; Delete selected text with what you type
+(delete-selection-mode 1)
+
+;; Prevent start screen
+(setq inhibit-startup-screen t)
