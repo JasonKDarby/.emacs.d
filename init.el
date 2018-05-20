@@ -28,32 +28,47 @@
   (unless (package-installed-p p)
     (package-install p)))
 
+(defvar mode-hooks
+  '(clojure-mode-hook
+    cider-mode-hook
+    cider-repl-mode-hook
+    emacs-lisp-mode-hook
+    eval-expression-minibuffer-setup-hook))
+
+(defvar modes
+  '(rainbow-delimiters-mode
+    paredit-mode
+    eldoc-mode))
+
+;; Apply modes to mode-hooks
+(dolist (hook mode-hooks)
+  (dolist (mode modes)
+    (add-hook hook mode)))
+
 (setq cider-font-lock-dynamically '(macro core function var))
 
+;; Make the cursor a horizontal bar instead of the box
 (set-default 'cursor-type 'hbar)
 
-(add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
-
-(add-hook 'clojure-mode-hook #'paredit-mode)
-
-(add-hook 'cider-mode-hook #'eldoc-mode)
-
-(add-hook 'cider-repl-mode-hook #'paredit-mode)
-
-(add-hook 'prog-mode-hook 'paredit-everywhere-mode)
-
+;; Autocomplete everywhere.  It's kind of funny, it autocompleted most of this line.
 (global-company-mode)
 
+;; Makes autocomplete return uppercase if the completion calls for it.
 (setq company-dabbrev-downcase 0)
 
+;; Set autocomplete to trigger immediately
 (setq company-idle-delay 0)
 
+;; Controls the cider pretty print function
 (setq cider-pprint-fn "pprint")
 
-(setq projectile-completion-system 'ivy)
+;; Prevent cider from showing the error buffer automatically
+(setq cider-show-error-buffer nil)
 
-(setq magit-completing-read-function 'ivy-completing-read)
+;; Prevent cider from jumping to the error buffer
+(setq cider-auto-select-error-buffer nil)
 
+;; Set ivy related settings and keybindings
 (ivy-mode 1)
 (setq ivy-use-virtual-buffers t)
 (setq enable-recursive-minibuffers t)
@@ -74,6 +89,12 @@
 (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
+(setq magit-completing-read-function 'ivy-completing-read)
+
+(setq projectile-completion-system 'ivy)
+
+;; Define theme
 (load-theme 'tango-dark t)
 
+;; TODO:  What does this even do?  Find out and remove if unnecessary.
 (setq ansi-color-faces-vector [default default default italic underline success warning error])
