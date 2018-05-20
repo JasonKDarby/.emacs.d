@@ -25,7 +25,8 @@
     all-the-icons-ivy
     zoom
     aggressive-indent
-    powerline))
+    powerline
+    base16-theme))
 
 (dolist (p my-packages)
   (unless (package-installed-p p)
@@ -98,7 +99,7 @@
 (setq projectile-completion-system 'ivy)
 
 ;; Define theme
-(load-theme 'tango-dark t)
+(load-theme 'base16-chalk t)
 
 ;; TODO:  What does this even do?  Find out and remove if unnecessary.
 (setq ansi-color-faces-vector [default default default italic underline success warning error])
