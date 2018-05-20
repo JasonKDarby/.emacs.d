@@ -133,6 +133,10 @@
 ;; Delete selected text with what you type
 (delete-selection-mode 1)
 
+;; Make backspace and delete perform expected functionality, paredit changes it
+(put 'paredit-backward-delete 'delete-selection 'supersede)
+(put 'paredit-forward-delete 'delete-selection 'supersede)
+
 ;; Prevent start screen
 (setq inhibit-startup-screen t)
 
