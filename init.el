@@ -119,6 +119,12 @@ If point was already at that position, move point to beginning of line."
 ;; Set C-a because my macbook keyboard doesn't have easy home
 (global-set-key "\C-a" 'smart-beginning-of-line)
 
+(set-face-attribute 'default nil
+                    :family "Source Code Pro"
+                    :height 110
+                    :weight 'normal
+                    :width 'normal)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
