@@ -143,3 +143,6 @@
 ;; Sets the appearance of the bar that shows up at the bottom of buffers
 (require 'powerline)
 (powerline-center-theme)
+
+(custom-set-variables
+ '(zoom-size '(0.618 . 0.618)))
