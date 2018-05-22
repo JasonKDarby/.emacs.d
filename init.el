@@ -144,5 +144,16 @@
 (require 'powerline)
 (powerline-center-theme)
 
+;; See https://stackoverflow.com/questions/151945/how-do-i-control-how-emacs-makes-backup-files
+;; Make emacs put backup files outside of the current directory
+(setq backup-directory-alist `(("." . "~/.saves")))
+(setq backup-by-copying t)
+
+;; Backup settings that will hopefully help me out
+(setq delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)
+
 (custom-set-variables
  '(zoom-size '(0.618 . 0.618)))
