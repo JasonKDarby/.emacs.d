@@ -124,13 +124,21 @@
 (global-set-key "\C-e" 'mwim-end)
 
 ;; Set font, will probably need to update with fallback options
-(set-face-attribute 'default nil
-                    :family (cond
-                             ((eq system-type 'darwin) "Fira Code Retina")
-                             (t "Source Code Pro Regular"))
-                    :height 110
-                    :weight 'normal
-                    :width 'normal)
+(cond
+ ((eq system-type 'darwin) (set-face-attribute
+                            'default nil
+                            :family "Fira Code Retina"
+                            :height 110
+                            :weight 'normal
+                            :width 'normal))
+ ((eq system-type 'gnu/linux) (set-face-attribute
+                               'default nil
+                               :font "DejaVu Sans Mono"))
+ (t (set-face-attribute 'default nil
+                        :family "Source Code Pro Regular"
+                        :height 110
+                        :weight 'normal
+                        :width 'normal)))
 
 ;; Apply syntax highlighting to defined symbols
 (setq cider-font-lock-dynamically '(macro core function var))
