@@ -56,7 +56,8 @@
 ;; Make the cursor a horizontal bar instead of the box
 (set-default 'cursor-type 'hbar)
 
-;; Autocomplete everywhere.  It's kind of funny, it autocompleted most of this line.
+;; Autocomplete everywhere.  It's kind of funny, it autocompleted most of this
+;; line.
 (global-company-mode)
 
 ;; Makes autocomplete return uppercase if the completion calls for it.
@@ -103,10 +104,12 @@
 (load-theme 'base16-chalk t)
 
 ;; TODO:  What does this even do?  Find out and remove if unnecessary.
-(setq ansi-color-faces-vector [default default default italic underline success warning error])
+(setq ansi-color-faces-vector
+      [default default default italic underline success warning error])
 
-;; [MWIM](https://github.com/alezost/mwim.el) allows home and end to move to the beginning/end of expressions on a line
-;; in addition to the beginning/end of the line itself.
+;; [MWIM](https://github.com/alezost/mwim.el) allows home and end to move to the
+;; beginning/end of expressions on a line in addition to the beginning/end of
+;; the line itself.
 
 ;; Set home for keyboards with home keys
 (global-set-key [home] 'mwim-beginning)
@@ -154,6 +157,12 @@
       kept-new-versions 6
       kept-old-versions 2
       version-control t)
+
+;; Set syntax highlighting at 80 characters
+;; See https://www.emacswiki.org/emacs/EightyColumnRule
+(require 'whitespace)
+(setq whitespace-style '(face empty tabs lines-tail trailing))
+(global-whitespace-mode t)
 
 (custom-set-variables
  '(zoom-size '(0.618 . 0.618)))
