@@ -122,7 +122,9 @@
 
 ;; Set font, will probably need to update with fallback options
 (set-face-attribute 'default nil
-                    :family "Source Code Pro Regular"
+                    :family (cond
+                             ((eq system-type 'darwin) "Fira Code Retina")
+                             (t "Source Code Pro Regular"))
                     :height 110
                     :weight 'normal
                     :width 'normal)
