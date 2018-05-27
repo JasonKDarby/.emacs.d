@@ -33,6 +33,16 @@
   (unless (package-installed-p p)
     (package-install p)))
 
+;; Set global modes
+
+;; Autocomplete everywhere.  It's kind of funny, it autocompleted most of this
+;; line.
+(global-company-mode)
+
+(projectile-global-mode)
+
+;; Set non-global modes
+
 (defvar mode-hooks
   '(clojure-mode-hook
     cider-mode-hook
@@ -45,8 +55,7 @@
     paredit-mode
     eldoc-mode
     zoom-mode
-    aggressive-indent-mode
-    projectile-mode))
+    aggressive-indent-mode))
 
 ;; Apply modes to mode-hooks
 (dolist (hook mode-hooks)
@@ -55,10 +64,6 @@
 
 ;; Make the cursor a horizontal bar instead of the box
 (set-default 'cursor-type 'hbar)
-
-;; Autocomplete everywhere.  It's kind of funny, it autocompleted most of this
-;; line.
-(global-company-mode)
 
 ;; Makes autocomplete return uppercase if the completion calls for it.
 (setq company-dabbrev-downcase 0)
