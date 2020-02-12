@@ -162,6 +162,9 @@
 (require 'powerline)
 (powerline-center-theme)
 
+;; Cause magit status buffer to update when changes are saved
+(add-hook 'after-save-hook 'magit-after-save-refresh-status)
+
 ;; See https://stackoverflow.com/questions/151945/how-do-i-control-how-emacs-makes-backup-files
 ;; Make emacs put backup files outside of the current directory
 (setq backup-directory-alist `(("." . "~/.saves")))
