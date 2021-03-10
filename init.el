@@ -20,10 +20,8 @@
     counsel
     counsel-projectile
     ivy
-    ivy-pages
     swiper
     all-the-icons-ivy
-    zoom
     aggressive-indent
     powerline
     base16-theme
@@ -34,6 +32,7 @@
     (package-install p)))
 
 ;; Set global modes
+(menu-bar-mode 1)
 
 ;; Autocomplete everywhere.  It's kind of funny, it autocompleted most of this
 ;; line.
