@@ -137,7 +137,7 @@
                             :width 'normal))
  ((eq system-type 'gnu/linux) (set-face-attribute
                                'default nil
-                               :font "DejaVu Sans Mono"))
+                               :font "Fantasque Sans Mono"))
  (t (set-face-attribute 'default nil
                         :family "Source Code Pro Regular"
                         :height 110
