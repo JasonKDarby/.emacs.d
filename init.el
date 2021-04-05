@@ -113,10 +113,10 @@
 (use-package rainbow-delimiters)
 
 (use-package paredit
-             :config
-             ;;Make backspace and delete perform expected functionality
-             (put 'paredit-backward-delete 'delete-selection 'supersede)
-             (put 'paredit-forward-delete 'delete-selection 'supersede))
+  :config
+  ;;Make backspace and delete perform expected functionality
+  (put 'paredit-backward-delete 'delete-selection 'supersede)
+  (put 'paredit-forward-delete 'delete-selection 'supersede))
 
 (use-package paredit-everywhere)
 
@@ -127,9 +127,9 @@
 (use-package magit-find-file)
 
 (use-package counsel
-             :bind (:map minibuffer-local-map)
-             :config
-             (counsel-mode 1))
+  :bind (:map minibuffer-local-map)
+  :config
+  (counsel-mode 1))
 
 (use-package counsel-projectile)
 
@@ -145,31 +145,31 @@
 (use-package all-the-icons-ivy)
 
 (use-package helpful
-             :custom
-             (counsel-describe-function-function #'helpful-callable)
-             (counsel-describe-variable-function #'helpful-variable)
-             :bind
-             ([remap describe-function] . counsel-describe-function)
-             ([remap describe-command] . helpful-command)
-             ([remap describe-variable] . counsel-describe-variable)
-             ([remap describe-key] . helpful-key))
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
 
 (use-package aggressive-indent
-             :config
-             (global-aggressive-indent-mode 1))
+  :config
+  (global-aggressive-indent-mode 1))
 
 ;; Contains functions for moving to the beginning/end of line
 (use-package mwim)
 
 (use-package base16-theme
-             :config
-             (load-theme 'base16-chalk t))
+  :config
+  (load-theme 'base16-chalk t))
 
 ;; Set syntax highlighting at 80 characters
 (use-package whitespace
-             :config
-             (setq whitespace-style '(face empty tabs lines-trail trailing))
-             (global-whitespace-mode 1))
+  :config
+  (setq whitespace-style '(face empty tabs lines-trail trailing))
+  (global-whitespace-mode 1))
 
 (use-package which-key
   :diminish which-key-mode
@@ -178,8 +178,8 @@
   (setq which-key-idle-delay 1))
 
 (use-package powerline
-             :config
-             (powerline-center-theme))
+  :config
+  (powerline-center-theme))
 
 ;; Set non-global modes
 
