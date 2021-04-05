@@ -1,185 +1,200 @@
+;; BEGIN emacs things not related to specific packages
+
 (require 'package)
 
-(add-to-list 'package-archives
-             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+(setq package-archives
+      '(("GNU ELPA"     . "https://elpa.gnu.org/packages/")
+        ("MELPA Stable" . "https://stable.melpa.org/packages/")
+        ("MELPA"        . "https://melpa.org/packages/"))
+      package-archive-priorities
+      '(("MELPA Stable" . 10)
+        ("GNU ELPA"     . 5)
+        ("MELPA"        . 0)))
 
 (package-initialize)
 
-(defvar my-packages
-  '(better-defaults
-    projectile
-    clojure-mode
-    cider
-    rainbow-delimiters
-    paredit
-    paredit-everywhere
-    company
-    magit
-    magit-filenotify
-    magit-find-file
-    counsel
-    counsel-projectile
-    ivy
-    swiper
-    all-the-icons-ivy
-    aggressive-indent
-    powerline
-    base16-theme
-    mwim))
+;; Delete by moving to trash instead of just poof
+(setq-default delete-by-moving-to-trash t)
 
-(dolist (p my-packages)
-  (unless (package-installed-p p)
-    (package-install p)))
-
-;; Set global modes
+;; Enable menu bar
 (menu-bar-mode 1)
 
-;; Autocomplete everywhere.  It's kind of funny, it autocompleted most of this
-;; line.
-(global-company-mode)
+;; Remove tool bar and scroll bar
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
 
-(projectile-global-mode)
+;; Remove fringes
+(fringe-mode 0)
+
+;; Disable the startup screen
+(setq inhibit-startup-message t)
+
+;; Turn on line numbers
+(global-display-line-numbers-mode 1)
+
+;; Hey, it's a nice looking font
+(set-face-attribute
+ 'default nil
+ :font "Fantasque Sans Mono")
+
+;; Delete selected text with what you type
+(delete-selection-mode 1)
+
+;; Make the cursor a horizontal bar instead of the box
+(set-default 'cursor-type 'hbar)
+
+;; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+;; END emacs things not related to specific packages
+
+(use-package flycheck
+  :config
+  (global-flycheck-mode))
+
+(use-package company
+  :config
+  ;; Makes autocomplete return uppsercase if the completion calls for it
+  (setq company-dabbrev-downcase 0)
+
+  ;; Set autocomplete to trigger immediately
+  (setq company-idle-delay 0)
+
+  (global-company-mode))
+
+(use-package projectile
+  :config
+  (projectile-global-mode))
+
+;; BEGIN clojure
+(use-package clojure-mode)
+
+(use-package cider
+  :config
+  (setq cider-pprint-fn "pprint")
+
+  ;; Prevent cider from showing the error buffer automatically
+  (setq cider-show-error-buffer nil)
+
+  ;; Prevent cider from jumping to the error buffer
+  (setq cider-auto-select-error-buffer nil)
+
+  ;; A function for starting cider with a profile selected
+  ;; See https://stackoverflow.com/questions/18304271/how-do-i-choose-switch-leiningen-profiles-with-emacs-nrepl
+  (defun start-cider-repl-with-profile ()
+    (interactive)
+    (letrec ((profile (read-string "Enter profile name: "))
+             (lein-params (concat "with-profile +" profile " repl :headless")))
+      (message "lein-params set to: %s" lein-params)
+      (set-variable 'cider-lein-parameters lein-params)
+      (cider-jack-in '()))))
+
+;; END clojure
+
+;; BEGIN python
+
+(use-package py-autopep8)
+
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable)
+  (setq elpy-eldoc-show-current-function nil)
+
+  ;; Enable flycheck
+  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+  (add-hook 'elpy-mode-hook 'flycheck-mode)
+
+  ;; Enable autopep8
+  (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save))
+
+;; End python
+
+(use-package rainbow-delimiters)
+
+(use-package paredit
+             :config
+             ;;Make backspace and delete perform expected functionality
+             (put 'paredit-backward-delete 'delete-selection 'supersede)
+             (put 'paredit-forward-delete 'delete-selection 'supersede))
+
+(use-package paredit-everywhere)
+
+(use-package magit)
+
+(use-package magit-filenotify)
+
+(use-package magit-find-file)
+
+(use-package counsel
+             :bind (:map minibuffer-local-map)
+             :config
+             (counsel-mode 1))
+
+(use-package counsel-projectile)
+
+(use-package swiper)
+
+(use-package ivy
+  :diminish ivy-mode
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map)
+  :config
+  (ivy-mode 1))
+
+(use-package all-the-icons-ivy)
+
+(use-package helpful
+             :custom
+             (counsel-describe-function-function #'helpful-callable)
+             (counsel-describe-variable-function #'helpful-variable)
+             :bind
+             ([remap describe-function] . counsel-describe-function)
+             ([remap describe-command] . helpful-command)
+             ([remap describe-variable] . counsel-describe-variable)
+             ([remap describe-key] . helpful-key))
+
+(use-package aggressive-indent
+             :config
+             (global-aggressive-indent-mode 1))
+
+;; Contains functions for moving to the beginning/end of line
+(use-package mwim)
+
+(use-package base16-theme
+             :config
+             (load-theme 'base16-chalk t))
+
+;; Set syntax highlighting at 80 characters
+(use-package whitespace
+             :config
+             (setq whitespace-style '(face empty tabs lines-trail trailing))
+             (global-whitespace-mode 1))
+
+(use-package which-key
+  :diminish which-key-mode
+  :config
+  (which-key-mode)
+  (setq which-key-idle-delay 1))
+
+(use-package powerline
+             :config
+             (powerline-center-theme))
 
 ;; Set non-global modes
 
-(defvar mode-hooks
+(defun apply-modes-to-hooks (modes hooks)
+  (dolist (hook hooks)
+    (dolist (mode modes)
+      (add-hook hook mode))))
+
+(defvar lisp-modes
+  '(rainbow-delimiters-mode
+    eldoc-mode))
+
+(defvar lisp-mode-hooks
   '(clojure-mode-hook
     cider-mode-hook
     cider-repl-mode-hook
     emacs-lisp-mode-hook
     eval-expression-minibuffer-setup-hook))
-
-(defvar modes
-  '(rainbow-delimiters-mode
-    paredit-mode
-    eldoc-mode
-    zoom-mode
-    aggressive-indent-mode))
-
-;; Apply modes to mode-hooks
-(dolist (hook mode-hooks)
-  (dolist (mode modes)
-    (add-hook hook mode)))
-
-;; Make the cursor a horizontal bar instead of the box
-(set-default 'cursor-type 'hbar)
-
-;; Makes autocomplete return uppercase if the completion calls for it.
-(setq company-dabbrev-downcase 0)
-
-;; Set autocomplete to trigger immediately
-(setq company-idle-delay 0)
-
-;; Controls the cider pretty print function
-(setq cider-pprint-fn "pprint")
-
-;; Prevent cider from showing the error buffer automatically
-(setq cider-show-error-buffer nil)
-
-;; Prevent cider from jumping to the error buffer
-(setq cider-auto-select-error-buffer nil)
-
-;; Set ivy related settings and keybindings
-(ivy-mode 1)
-(setq ivy-use-virtual-buffers t)
-(setq enable-recursive-minibuffers t)
-(global-set-key "\C-s" 'swiper)
-(global-set-key (kbd "C-c C-r") 'ivy-resume)
-(global-set-key (kbd "<f6>") 'ivy-resume)
-(global-set-key (kbd "M-x") 'counsel-M-x)
-(global-set-key (kbd "C-x C-f") 'counsel-find-file)
-(global-set-key (kbd "<f1> f") 'counsel-describe-function)
-(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-(global-set-key (kbd "<f1> l") 'counsel-find-library)
-(global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-(global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-(global-set-key (kbd "C-c g") 'counsel-git)
-(global-set-key (kbd "C-c j") 'counsel-git-grep)
-(global-set-key (kbd "C-c k") 'counsel-ag)
-(global-set-key (kbd "C-x l") 'counsel-locate)
-(global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
-(define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
-
-(setq magit-completing-read-function 'ivy-completing-read)
-
-(setq projectile-completion-system 'ivy)
-
-;; Define theme
-(load-theme 'base16-chalk t)
-
-;; TODO:  What does this even do?  Find out and remove if unnecessary.
-(setq ansi-color-faces-vector
-      [default default default italic underline success warning error])
-
-;; [MWIM](https://github.com/alezost/mwim.el) allows home and end to move to the
-;; beginning/end of expressions on a line in addition to the beginning/end of
-;; the line itself.
-
-;; Set home for keyboards with home keys
-(global-set-key [home] 'mwim-beginning)
-
-;; Set C-a because my macbook keyboard doesn't have easy home
-(global-set-key "\C-a" 'mwim-beginning)
-
-;; Set end for keyboards with home keys
-(global-set-key [end] 'mwim-end)
-
-;; Set C-e because my macbook keyboard doesn't have easy home
-(global-set-key "\C-e" 'mwim-end)
-
-;; Set font, will probably need to update with fallback options
-(cond
- ((eq system-type 'darwin) (set-face-attribute
-                            'default nil
-                            :family "Fira Code Retina"
-                            :height 110
-                            :weight 'normal
-                            :width 'normal))
- ((eq system-type 'gnu/linux) (set-face-attribute
-                               'default nil
-                               :font "Fantasque Sans Mono"))
- (t (set-face-attribute 'default nil
-                        :family "Source Code Pro Regular"
-                        :height 110
-                        :weight 'normal
-                        :width 'normal)))
-
-;; Apply syntax highlighting to defined symbols
-(setq cider-font-lock-dynamically '(macro core function var))
-
-;; Delete selected text with what you type
-(delete-selection-mode 1)
-
-;; Make backspace and delete perform expected functionality, paredit changes it
-(put 'paredit-backward-delete 'delete-selection 'supersede)
-(put 'paredit-forward-delete 'delete-selection 'supersede)
-
-;; Prevent start screen
-(setq inhibit-startup-screen t)
-
-;; Sets the appearance of the bar that shows up at the bottom of buffers
-(require 'powerline)
-(powerline-center-theme)
-
-;; Cause magit status buffer to update when changes are saved
-(add-hook 'after-save-hook 'magit-after-save-refresh-status)
-
-;; See https://stackoverflow.com/questions/151945/how-do-i-control-how-emacs-makes-backup-files
-;; Make emacs put backup files outside of the current directory
-(setq backup-directory-alist `(("." . "~/.saves")))
-(setq backup-by-copying t)
-
-;; Backup settings that will hopefully help me out
-(setq delete-old-versions t
-      kept-new-versions 6
-      kept-old-versions 2
-      version-control t)
-
-;; Set syntax highlighting at 80 characters
-;; See https://www.emacswiki.org/emacs/EightyColumnRule
-(require 'whitespace)
-(setq whitespace-style '(face empty tabs lines-tail trailing))
-(global-whitespace-mode t)
-
-(custom-set-variables
- '(zoom-size '(0.618 . 0.618)))
