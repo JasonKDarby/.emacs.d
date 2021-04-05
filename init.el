@@ -198,3 +198,9 @@
     cider-repl-mode-hook
     emacs-lisp-mode-hook
     eval-expression-minibuffer-setup-hook))
+
+;; Startup
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (cd default-directory)
+            (eshell)))
