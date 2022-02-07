@@ -1,3 +1,5 @@
+
+
 ;; BEGIN emacs things not related to specific packages
 
 (require 'package)
@@ -48,13 +50,26 @@
 
 ;; END emacs things not related to specific packages
 
+(use-package diminish)
+
 (use-package flycheck
+  :ensure t
+  :diminish global-flycheck-mode
   :config
   (global-flycheck-mode))
 
-(use-package company
+(use-package paredit
+  :ensure t)
+
+(use-package paredit-everywhere
+  :ensure t
   :config
-  ;; Makes autocomplete return uppsercase if the completion calls for it
+  (add-hook 'prog-mode-hook 'paredit-everywhere-mode))
+
+(use-package company
+  :ensure t
+  :config
+  ;; Makes autocomplete return uppercase if the completion calls for it
   (setq company-dabbrev-downcase 0)
 
   ;; Set autocomplete to trigger immediately
@@ -63,15 +78,19 @@
   (global-company-mode))
 
 (use-package projectile
+  :ensure t
+  :diminish projectile-mode
   :config
-  (projectile-global-mode))
+  (projectile-mode))
 
 ;; BEGIN clojure
-(use-package clojure-mode)
+(use-package clojure-mode
+  :ensure t)
 
 (use-package cider
+  :ensure t
   :config
-  (setq cider-pprint-fn "pprint")
+  (setq cider-print-fn "pprint")
 
   ;; Prevent cider from showing the error buffer automatically
   (setq cider-show-error-buffer nil)
@@ -93,7 +112,8 @@
 
 ;; BEGIN python
 
-(use-package py-autopep8)
+(use-package py-autopep8
+  :ensure t)
 
 (use-package elpy
   :ensure t
@@ -110,41 +130,58 @@
 
 ;; End python
 
-(use-package rainbow-delimiters)
+(use-package json-mode
+  :ensure t
+  :defer 20
+  :custom (json-reformat:indent-width 2)
+  :mode ()
+  :bind
+  (:package json-mode-map
+            :map json-mode-map
+            ("C-c <tab>" . json-mode-beautify)))
 
-(use-package paredit
-  :config
-  ;;Make backspace and delete perform expected functionality
-  (put 'paredit-backward-delete 'delete-selection 'supersede)
-  (put 'paredit-forward-delete 'delete-selection 'supersede))
+(use-package diminish
+  :ensure t)
 
-(use-package paredit-everywhere)
+(use-package rainbow-delimiters
+  :ensure t
+  :diminish rainbow-delimiters-mode)
 
-(use-package magit)
+(use-package magit
+  :ensure t)
 
-(use-package magit-filenotify)
+(use-package magit-filenotify
+  :ensure t)
 
-(use-package magit-find-file)
+(use-package magit-find-file
+  :ensure t)
 
 (use-package counsel
+  :ensure t
+  :diminish counsel-mode
   :bind (:map minibuffer-local-map)
   :config
   (counsel-mode 1))
 
-(use-package counsel-projectile)
+(use-package counsel-projectile
+  :ensure t)
 
-(use-package swiper)
+(use-package swiper
+  :ensure t)
 
 (use-package ivy
+  :ensure t
   :diminish ivy-mode
   :bind (("C-s" . swiper)
          :map ivy-minibuffer-map)
   :config
   (ivy-mode 1))
 
-(use-package all-the-icons-ivy)
+(use-package all-the-icons-ivy
+  :ensure t)
 
 (use-package helpful
+  :ensure t
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
@@ -155,52 +192,71 @@
   ([remap describe-key] . helpful-key))
 
 (use-package aggressive-indent
+  :ensure t
+  :diminish aggressive-indent-mode
   :config
   (global-aggressive-indent-mode 1))
 
 ;; Contains functions for moving to the beginning/end of line
-(use-package mwim)
+(use-package mwim
+  :ensure t)
 
 (use-package base16-theme
+  :ensure t
   :config
   (load-theme 'base16-chalk t))
 
 ;; Set syntax highlighting at 80 characters
 (use-package whitespace
+  :ensure t
+  :diminish global-whitespace-mode
   :config
   (setq whitespace-style '(face empty tabs lines-trail trailing))
   (global-whitespace-mode 1))
 
 (use-package which-key
+  :ensure t
   :diminish which-key-mode
   :config
   (which-key-mode)
   (setq which-key-idle-delay 1))
 
 (use-package powerline
+  :ensure t
   :config
   (powerline-center-theme))
 
+(use-package shell-here
+  :ensure t)
+
 ;; Set non-global modes
 
-(defun apply-modes-to-hooks (modes hooks)
-  (dolist (hook hooks)
-    (dolist (mode modes)
-      (add-hook hook mode))))
+(add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'cider-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'rainbow-delimiters-mode)
 
-(defvar lisp-modes
-  '(rainbow-delimiters-mode
-    eldoc-mode))
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+(add-hook 'clojure-mode-hook #'enable-paredit-mode)
+(add-hook 'cider-mode-hook #'enable-paredit-mode)
+(add-hook 'cider-repl-mode-hook #'enable-paredit-mode)
+(add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 
-(defvar lisp-mode-hooks
-  '(clojure-mode-hook
-    cider-mode-hook
-    cider-repl-mode-hook
-    emacs-lisp-mode-hook
-    eval-expression-minibuffer-setup-hook))
+(add-hook 'clojure-mode-hook #'eldoc-mode)
+(add-hook 'cider-mode-hook #'eldoc-mode)
+(add-hook 'cider-repl-mode-hook #'eldoc-mode)
+(add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode)
 
-;; Startup
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (cd default-directory)
-            (eshell)))
+;; Useful functions
+(defun remove-dos-eol ()
+  "Do not show ^M in files containing mixed UNIX and DOS line endings."
+  (interactive)
+  (setq buffer-display-table (make-display-table))
+  (aset buffer-display-table ?\^M []))
