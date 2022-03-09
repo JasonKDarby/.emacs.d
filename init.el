@@ -28,6 +28,9 @@
 ;; Remove fringes
 (fringe-mode 0)
 
+;; Automatically sync changes from filesystem to buffer (if buffer has no unsaved changes)
+(global-auto-revert-mode 1)
+
 ;; Disable the startup screen
 (setq inhibit-startup-message t)
 
@@ -43,7 +46,8 @@
 (delete-selection-mode 1)
 
 ;; Make the cursor a horizontal bar instead of the box
-(set-default 'cursor-type 'hbar)
+;;(set-default 'cursor-type 'hbar)
+;; Trying the box for a while
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -52,14 +56,11 @@
 
 (use-package diminish)
 
-(use-package flycheck
-  :ensure t
-  :diminish global-flycheck-mode
-  :config
-  (global-flycheck-mode))
-
 (use-package paredit
-  :ensure t)
+  :ensure t
+  :config
+  (show-paren-mode t)
+  :diminish nil)
 
 (use-package paredit-everywhere
   :ensure t
@@ -90,7 +91,9 @@
 (use-package cider
   :ensure t
   :config
-  (setq cider-print-fn "pprint")
+  ;; Disabled due to incompatibility with nREPL (why??)
+  ;; TODO: fix
+  ;;(setq cider-print-fn "pprint")
 
   ;; Prevent cider from showing the error buffer automatically
   (setq cider-show-error-buffer nil)
@@ -109,26 +112,6 @@
       (cider-jack-in '()))))
 
 ;; END clojure
-
-;; BEGIN python
-
-(use-package py-autopep8
-  :ensure t)
-
-(use-package elpy
-  :ensure t
-  :init
-  (elpy-enable)
-  (setq elpy-eldoc-show-current-function nil)
-
-  ;; Enable flycheck
-  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-  (add-hook 'elpy-mode-hook 'flycheck-mode)
-
-  ;; Enable autopep8
-  (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save))
-
-;; End python
 
 (use-package json-mode
   :ensure t
@@ -212,7 +195,7 @@
   :diminish global-whitespace-mode
   :config
   (setq whitespace-style '(face empty tabs lines-trail trailing))
-  (global-whitespace-mode 1))
+  (global-whitespace-mode 0))
 
 (use-package which-key
   :ensure t
