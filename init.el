@@ -63,18 +63,15 @@
 (use-package diminish)
 
 (use-package paredit
-  :ensure t
   :config
   (show-paren-mode t)
   :diminish nil)
 
 (use-package paredit-everywhere
-  :ensure t
   :config
   (add-hook 'prog-mode-hook 'paredit-everywhere-mode))
 
 (use-package company
-  :ensure t
   :config
   ;; Makes autocomplete return uppercase if the completion calls for it
   (setq company-dabbrev-downcase 0)
@@ -85,17 +82,14 @@
   (global-company-mode))
 
 (use-package projectile
-  :ensure t
   :diminish projectile-mode
   :config
   (projectile-mode))
 
 ;; BEGIN clojure
-(use-package clojure-mode
-  :ensure t)
+(use-package clojure-mode)
 
 (use-package cider
-  :ensure t
   :config
   ;; Disabled due to incompatibility with nREPL (why??)
   ;; TODO: fix
@@ -120,7 +114,6 @@
 ;; END clojure
 
 (use-package json-mode
-  :ensure t
   :defer 20
   :custom (json-reformat:indent-width 2)
   :mode ()
@@ -129,48 +122,37 @@
             :map json-mode-map
             ("C-c <tab>" . json-mode-beautify)))
 
-(use-package diminish
-  :ensure t)
+(use-package diminish)
 
 (use-package rainbow-delimiters
-  :ensure t
   :diminish rainbow-delimiters-mode)
 
-(use-package magit
-  :ensure t)
+(use-package magit)
 
-(use-package magit-filenotify
-  :ensure t)
+(use-package magit-filenotify)
 
-(use-package magit-find-file
-  :ensure t)
+(use-package magit-find-file)
 
 (use-package counsel
-  :ensure t
   :diminish counsel-mode
   :bind (:map minibuffer-local-map)
   :config
   (counsel-mode 1))
 
-(use-package counsel-projectile
-  :ensure t)
+(use-package counsel-projectile)
 
-(use-package swiper
-  :ensure t)
+(use-package swiper)
 
 (use-package ivy
-  :ensure t
   :diminish ivy-mode
   :bind (("C-s" . swiper)
          :map ivy-minibuffer-map)
   :config
   (ivy-mode 1))
 
-(use-package all-the-icons-ivy
-  :ensure t)
+(use-package all-the-icons-ivy)
 
 (use-package helpful
-  :ensure t
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
@@ -181,42 +163,35 @@
   ([remap describe-key] . helpful-key))
 
 (use-package aggressive-indent
-  :ensure t
   :diminish aggressive-indent-mode
   :config
   (global-aggressive-indent-mode 1))
 
 ;; Contains functions for moving to the beginning/end of line
-(use-package mwim
-  :ensure t)
+(use-package mwim)
 
 (use-package base16-theme
-  :ensure t
   :config
   (load-theme 'base16-chalk t))
 
 ;; Set syntax highlighting at 80 characters
 (use-package whitespace
-  :ensure t
   :diminish global-whitespace-mode
   :config
   (setq whitespace-style '(face empty tabs lines-trail trailing))
   (global-whitespace-mode 0))
 
 (use-package which-key
-  :ensure t
   :diminish which-key-mode
   :config
   (which-key-mode)
   (setq which-key-idle-delay 1))
 
 (use-package powerline
-  :ensure t
   :config
   (powerline-center-theme))
 
-(use-package shell-here
-  :ensure t)
+(use-package shell-here)
 
 ;; Set non-global modes
 
