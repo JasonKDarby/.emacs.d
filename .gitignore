@@ -67,6 +67,33 @@ company-statistics-cache.el
 # anaconda-mode
 anaconda-mode/
 
+# projectile cache
+projectile.cache
+
+# straight
+straight/
+
+# fennel lang
+fennel-mode/
+
+# emacs bookmarks
+bookmarks
+
+# lsp session
+.lsp-session-v1
+
+# fonts downloaded by all-the-icons
+fonts/
+
+# ?
+network-security.data
+
+# mystery cache
+.cache/
+
+# mystery transient
+transient/
+
 
 # End of https://www.gitignore.io/api/emacs
 
