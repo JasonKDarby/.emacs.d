@@ -20,11 +20,15 @@
 ;; Delete by moving to trash instead of just poof
 (setq-default delete-by-moving-to-trash t)
 
-;; Enable menu bar
-(menu-bar-mode 1)
+;; Make all backup files go to one spot instead of littering folders everywhere
+(setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))
+
+;; Disable menu bar
+(menu-bar-mode -1)
 
 ;; Remove tool bar and scroll bar
 (tool-bar-mode -1)
+
 (scroll-bar-mode -1)
 
 ;; Automatically sync changes from filesystem to buffer (if buffer has no unsaved changes)
@@ -66,10 +70,19 @@
 
 ;; END emacs things not related to specific packages
 
+
+;; THEMES - I am fickle
 ;; See visualizations at https://github.com/doomemacs/themes/tree/screenshots
-(use-package doom-themes
+(use-package doom-themes)
+
+(use-package gruvbox-theme
   :config
-  (load-theme 'doom-manegarm t))
+  (load-theme 'gruvbox t))
+
+;; See visualizations at https://belak.github.io/base16-emacs/
+(use-package base16-theme)
+
+
 
 (use-package dired-single
   :defer t)
