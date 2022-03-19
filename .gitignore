@@ -94,6 +94,8 @@ network-security.data
 # mystery transient
 transient/
 
+# emacs custom.  This means any non-scripted customizations will not be part of the repository so will not show up on other machines.
+custom.el
 
 # End of https://www.gitignore.io/api/emacs
 

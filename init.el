@@ -312,17 +312,10 @@
   (setq buffer-display-table (make-display-table))
   (aset buffer-display-table ?\^M []))
 
-;; TODO: make this go to a different file
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("58115a5caf2c19aa48de6562c70dfaec47b429707389e03ef59f22f6f6be65ab" "4294559fea7408018ed1879bd921d79729ef45a65ed4045dc5d9dbcd89e5725f" "5acb6c8cb656d2c5beeda835a7870f95792a08efbb7011a0f40d5123158cef73" "c162e6033d801080f0af776ef829cbc08cfff649bab72ca5be1122939ce3eff2" "fc8567bceceacb43b80e0bf28ba709500c139f3a389f575ca77503621a820bee" "1072d0e743f32dbf63de967331bca80f30edb00c3eda2d65a63b3e60d029c479" "ec1e5d8a563f3b89215dde47e45f61bf58b4efc7385750b6235ddf9232da06b4" "9dbf8bbe18f69ca7f9cddf3f78c45ae804935b1412e719b1ce3f08a0701bfb95" "8e660fd9166774764d69a4c19a86822f656abaacf6584531b2a01949452e441f" "329458d9b4c24c8c253ab2fd57bc48a1a38eb0fbd7d5f3f3f923cbb1530af87e" "868d20268275edd9bde186f2c5e2d790ee0961f8f30566e42ae94829a460d6c8" "9ad49a343bd4a455cf53b3349b51cb87e52d1271d98cc2141803801cbfdfca0f" "3d39868703fc81340f7b7bcf184980689496893a5f075db3ebf71806d9b3e9d7" "59f15086eeccce2d6a650492ba0124cb4bedaab20810d12a6b81a191ec4b9d9b" "b44396213fcedc2e9677814fd02111b346a181c9864a1909002c6829d6fbd570" "52294a82f187b6a9d601a26b491ebd7adf14f24c3b95867f3c35a1b2e794af2b" "bace3bc543a9966d962766c08567a8b15890c44cc7bf2ea93ce20d99795f7fb5" "d6c3b3665814aa428b655a272cd0d278fb9d3d40239dfb56d5ee3bc82868d4e0" "a7a91004284dbf68f35c4befb6d40609457f7d93a856aaccb16e25d761adcf55" "9e469516b728ddf4f86d49a400924bc6b78adb0947f728978a0402e64b15dfe1" "d42fb53fc081b2258e8bd1a3ed6f46a911c5f0e596c3a99218ba85b84a908cb3" "167171ae09d9161a27bfc1a4b0812a0590469b91583f60bb49f30ae29ce0515e" "d8f84f55ebc7233b4657c2db1f5a82bcd4f99dca5e41c6c7c4c2bc45ccfab10b" "ecec5199cd5685333f51e12473ed703d7437c2d87db4cec8543ce4684c5d374e" default)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; put auto generated custom information into a separate file
+(setq custom-file "~/.emacs.d/custom.el")
+(cond ((file-directory-p custom-file)
+       (load custom-file))
+      (t (progn
+           (write-region "" nil custom-file)
+           (load custom-file))))
