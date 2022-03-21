@@ -68,6 +68,10 @@
 
 (setq even-window-sizes nil)
 
+(mapc 'global-unset-key [[up] [down] [left] [right] [prior] [next] [home] [end] [insert]])
+
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+
 ;; END emacs things not related to specific packages
 
 
@@ -83,7 +87,6 @@
 (use-package base16-theme)
 
 
-
 (use-package dired-single
   :defer t)
 
@@ -96,7 +99,6 @@
 (use-package diminish)
 
 (use-package paredit
-  :diminish paredit-mode
   :hook ((clojure-mode . paredit-mode)
          (cider-mode . paredit-mode)
          (cider-repl-mode . paredit-mode)
@@ -114,12 +116,10 @@
   (add-hook 'prog-mode-hook 'paredit-everywhere-mode))
 
 (use-package indent-guide
-  :diminish indent-guide-mode
   :config
   (indent-guide-global-mode))
 
 (use-package company
-  :diminish company-mode
   :config
   ;; Makes autocomplete return uppercase if the completion calls for it
   (setq company-dabbrev-downcase 0)
@@ -187,7 +187,6 @@
   (diminish 'eldoc-mode))
 
 (use-package rainbow-delimiters
-  :diminish rainbow-delimiters-mode
   :hook ((clojure-mode . rainbow-delimiters-mode)
          (cider-mode . rainbow-delimiters-mode)
          (cider-repl-mode . rainbow-delimiters-mode)
@@ -214,7 +213,6 @@
 
 ;; See https://config.daviwil.com/emacs#better-completions-with-ivy
 (use-package ivy
-  :diminish
   :bind (("C-s" . swiper)
          :map ivy-minibuffer-map
 	       ("TAB" . ivy-alt-done)
@@ -248,7 +246,6 @@
   :after counsel)
 
 (use-package projectile
-  :diminish projectile-mode
   :config
   (projectile-mode)
   :bind-keymap
@@ -283,7 +280,6 @@
   ([remap describe-key] . helpful-key))
 
 (use-package aggressive-indent
-  :diminish aggressive-indent-mode
   :config
   (global-aggressive-indent-mode 1))
 
@@ -294,20 +290,14 @@
 
 ;; Set syntax highlighting at 80 characters
 (use-package whitespace
-  :diminish global-whitespace-mode
   :config
   (setq whitespace-style '(face empty tabs lines-trail trailing))
   (global-whitespace-mode 0))
 
 (use-package which-key
   :init (which-key-mode)
-  :diminish which-key-mode
   :config
   (setq which-key-idle-delay 0.3))
-
-(use-package powerline
-  :config
-  (powerline-center-theme))
 
 (use-package eldoc-mode
   :straight nil
@@ -317,6 +307,12 @@
          (emacs-lisp-mode . eldoc-mode))
   :config
   (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode))
+
+(use-package disable-mouse
+  :config
+  (global-disable-mouse-mode))
+
+
 
 ;; Useful functions
 (defun remove-dos-eol ()
