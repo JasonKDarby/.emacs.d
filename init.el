@@ -72,6 +72,12 @@
 
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
+;; https://www.emacswiki.org/emacs/WindMove
+;; Shift+arrow will move to buffers directionally
+;; Note that this works even if arrow keys are unbound (because it's a modifier + key)
+(when (fboundp 'windmove-default-keybindings)
+  (windmove-default-keybindings))
+
 ;; END emacs things not related to specific packages
 
 
