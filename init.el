@@ -220,20 +220,12 @@
 ;; See https://config.daviwil.com/emacs#better-completions-with-ivy
 (use-package ivy
   :bind (("C-s" . swiper)
+         ("C-r" . swiper-backward)
          :map ivy-minibuffer-map
 	       ("TAB" . ivy-alt-done)
-	       ("C-f" . ivy-alt-done)
-	       ("C-l" . ivy-alt-done)
-	       ("C-j" . ivy-next-line)
-	       ("C-k" . ivy-previous-line)
 	       ;; binds go here
 	       :map ivy-switch-buffer-map
-	       ("C-k" . ivy-previous-line)
-	       ("C-l" . ivy-done)
-	       ("C-d" . ivy-switch-buffer-kill)
-	       :map ivy-reverse-i-search-map
-	       ("C-k" . ivy-previous-line)
-	       ("C-d" . ivy-reverse-i-search-kill))
+	       :map ivy-reverse-i-search-map)
   :init
   (ivy-mode 1)
   :config
@@ -264,6 +256,18 @@
 	       ("C-x C-f" . counsel-find-file)
 	       ("C-M-j" . counsel-switch-buffer)
 	       ("C-M-l" . counsel-imenu)
+         ("C-c g" . counsel-git)
+         ("C-c j" . counsel-git-grep)
+         ("C-c k" . counsel-ag)
+         ("C-x l" . counsel-locate)
+         ("C-S-o" . counsel-rythmbox)
+         ("<f6>" . ivy-resume)
+         ("<f1> f" . counsel-describe-function)
+         ("<f1> v" . counsel-describe-variable)
+         ("<f1> o" . counsel-describe-symbol)
+         ("<f1> l" . counsel-find-library)
+         ("<f2> i" . counsel-info-lookup-symbol)
+         ("<f2> u" . counsel-unicode-char)
 	       :map minibuffer-local-map
 	       ("C-r" . 'counsel-minibuffer-history))
   :config
@@ -317,8 +321,6 @@
 (use-package disable-mouse
   :config
   (global-disable-mouse-mode))
-
-
 
 ;; Useful functions
 (defun remove-dos-eol ()
