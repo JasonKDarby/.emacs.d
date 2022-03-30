@@ -1,4 +1,11 @@
+(setq mac-command-modifier 'control)
+
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+
 (setq package-enable-at-startup nil)
+
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -80,6 +87,9 @@
 
 ;; END emacs things not related to specific packages
 
+;; Kubernetes management
+(use-package kubernetes
+  :commands (kubernetes-overview))
 
 ;; THEMES - I am fickle
 ;; See visualizations at https://github.com/doomemacs/themes/tree/screenshots
@@ -214,6 +224,25 @@
   :defer t)
 
 ;; ESHELL
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+    (setq ls-lisp-use-insert-directory-program nil)
+    (require 'ls-lisp)
+
+    (setq shell-command-switch "-ic")
+
+    (exec-path-from-shell-copy-env "JAVA_HOME")
+    (exec-path-from-shell-copy-env "VISUAL")
+    (exec-path-from-shell-copy-env "EDITOR")
+    (exec-path-from-shell-initialize)))
+
+(use-package eshell-git-prompt)
+
+(use-package eshell
+  :config
+  (eshell-git-prompt-use-theme 'git-radar))
+
 (use-package fish-completion
   :hook (eshell-mode . fish-completion-mode))
 
@@ -253,6 +282,7 @@
 
 (use-package projectile
   :config
+  (setq projectile-switch-project-action #'projectile-dired)
   (projectile-mode)
   :bind-keymap
   ("C-c p" . projectile-command-map))
