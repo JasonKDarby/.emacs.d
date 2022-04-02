@@ -58,7 +58,9 @@
 (delete-selection-mode 1)
 
 ;; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+;; (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+;; This is on probation to break habits of escaping windows
+(global-set-key (kbd "<escape>") 'keyboard-quit)
 
 (setq tramp-default-method "ssh")
 
@@ -75,8 +77,6 @@
 
 (setq even-window-sizes nil)
 
-(mapc 'global-unset-key [[up] [down] [left] [right] [prior] [next] [home] [end] [insert]])
-
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
 ;; https://www.emacswiki.org/emacs/WindMove
@@ -87,9 +87,10 @@
 
 ;; END emacs things not related to specific packages
 
-;; Kubernetes management
-(use-package kubernetes
-  :commands (kubernetes-overview))
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . markdown-view-mode)
+  :init (setq markdown-command "multimarkdown"))
 
 ;; THEMES - I am fickle
 ;; See visualizations at https://github.com/doomemacs/themes/tree/screenshots
@@ -116,6 +117,7 @@
 
 (use-package paredit
   :hook ((clojure-mode . paredit-mode)
+         (clojurescript-mode . paredit-mode)
          (cider-mode . paredit-mode)
          (cider-repl-mode . paredit-mode)
          (emacs-lisp-mode . paredit-mode)
@@ -140,26 +142,58 @@
   ;; Makes autocomplete return uppercase if the completion calls for it
   (setq company-dabbrev-downcase 0)
 
-  ;; Set autocomplete to trigger immediately
-  (setq company-idle-delay 0)
+  ;; Set company settings according to https://github.com/clojure-lsp/clojure-lsp/issues/884 for performance
+  (setq company-minimum-prefix-length 2)
+  (setq company-idle-delay 0.2)
 
   (global-company-mode))
 
-;; BEGIN clojure
-(use-package clojure-mode)
+(use-package yasnippet
+  :config
+  (yas-global-mode))
 
-(use-package cider
+(use-package yasnippet-snippets)
+
+;; BEGIN clojure
+(use-package flycheck-clj-kondo
+  :config
+  (global-flycheck-mode))
+
+(use-package clojure-mode
   :config
   ;; Disabled due to incompatibility with nREPL (why??)
   ;; TODO: fix
   ;;(setq cider-print-fn "pprint")
+  
+  (require 'flycheck-clj-kondo))
 
+(use-package cider
+  :config
   ;; Prevent cider from showing the error buffer automatically
   (setq cider-show-error-buffer nil)
 
   ;; Prevent cider from jumping to the error buffer
   (setq cider-auto-select-error-buffer nil)
 
+  ;; Prevent cider from creating new windows for ** buffers
+  (setq nrepl-hide-special-buffers t)
+
+  ;; Provide syntax highlighting for user defined symbols
+  (setq cider-font-lock-dynamically '(macro core function var))
+
+  ;; I would like to use xref but ctag generation was not finding clojure function definitions because ???
+  ;;(setq cider-use-xref nil)
+
+  ;; Make tab provide completions if code is already indented
+  ;; Note that M-TAB does this by default if M-TAB isn't used for switching windows through the OS windowing system
+  (setq tab-always-indent 'complete)
+
+  (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
+  
+  ;; Provide fuzzy matching for completions
+  (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
+  (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
+  
   ;; A function for starting cider with a profile selected
   ;; See https://stackoverflow.com/questions/18304271/how-do-i-choose-switch-leiningen-profiles-with-emacs-nrepl
   (defun start-cider-repl-with-profile ()
@@ -170,22 +204,19 @@
       (set-variable 'cider-lein-parameters lein-params)
       (cider-jack-in '()))))
 
-(setq lsp-lens-enable t)
-
-;; https://clojure-lsp.io/clients/#emacs
-(use-package lsp-mode
-  :hook ((clojure-mode . lsp)
-         (clojurec-mode . lsp)
-         (clojurescript-mode . lsp))
+(use-package clj-decompiler
   :config
-  (dolist (m '(clojure-mode
-               clojurec-mode
-               clojurescript-mode
-               clojurex-mode))
-    (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))))
+  (add-hook 'cider-mode-hook
+            (lambda ()
+              (eval-after-load 'cider
+                '(progn
+                   (require 'clj-decompiler)
+                   (clj-decompiler-setup))))))
 
-(use-package lsp-ui
-  :commands lsp-ui-mode)
+(use-package clj-refactor
+  :hook ((clojure-mode . clj-refactor-mode)
+         (clojure-mode . yas-minor-mode))
+  :config (cljr-add-keybindings-with-prefix "C-c C-m"))
 
 ;; END clojure
 
@@ -214,8 +245,6 @@
   :commands (magit-status magit-get-current-branch)
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-
-(use-package magit-filenotify)
 
 (use-package magit-find-file
   :bind ("C-c f" . magit-find-file-completing-read))
@@ -273,9 +302,11 @@
   :after counsel)
 
 (use-package projectile
-  :config
+  :init
   (setq projectile-switch-project-action #'projectile-dired)
+  :config
   (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
   :bind-keymap
   ("C-c p" . projectile-command-map))
 
@@ -305,8 +336,8 @@
 
 (use-package counsel-projectile
   :after projectile
-  :bind (("C-M-p" . counsel-projectile-find-file))
   :config
+  (setq counsel-projectile-switch-project-action #'counsel-projectile-switch-project-action-dired)
   (counsel-projectile-mode))
 
 (use-package helpful
