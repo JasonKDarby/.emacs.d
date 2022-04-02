@@ -79,6 +79,15 @@
 
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
+;; See https://karthinks.com/software/batteries-included-with-emacs/
+(defun pulse-line (&rest _)
+  "Pulse the current line."
+  (pulse-momentary-highlight-one-line (point)))
+
+(dolist (command '(scroll-up-command scroll-down-command
+                                     recenter-top-bottom other-window))
+  (advice-add command :after #'pulse-line))
+
 ;; https://www.emacswiki.org/emacs/WindMove
 ;; Shift+arrow will move to buffers directionally
 ;; Note that this works even if arrow keys are unbound (because it's a modifier + key)
