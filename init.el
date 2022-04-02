@@ -87,14 +87,25 @@
 (dolist (command '(scroll-up-command scroll-down-command
                                      recenter-top-bottom other-window))
   (advice-add command :after #'pulse-line))
-
 ;; https://www.emacswiki.org/emacs/WindMove
 ;; Shift+arrow will move to buffers directionally
 ;; Note that this works even if arrow keys are unbound (because it's a modifier + key)
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings))
 
+(global-prettify-symbols-mode 1)
+
 ;; END emacs things not related to specific packages
+
+(use-package undo-tree
+  :custom
+  (undo-tree-visualizer-diff t)
+  ;; TODO: this should be dynamically constructed based on user-emacs-directory
+  ;; but some detail of list evaluation causes an error because the args fail stringp
+  (undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree")))
+  (undo-tree-visualizer-timestamps t)
+  :config
+  (global-undo-tree-mode))
 
 (use-package markdown-mode
   :ensure t
@@ -112,15 +123,9 @@
 ;; See visualizations at https://belak.github.io/base16-emacs/
 (use-package base16-theme)
 
-
-(use-package dired-single
-  :defer t)
-
-(use-package dired-collapse
-  :defer t)
-
-(use-package dired-ranger
-  :defer t)
+(use-package dired-subtree
+  :defer t
+  :bind ([remap dired-maybe-insert-subdir] . dired-subtree-cycle))
 
 (use-package diminish)
 
