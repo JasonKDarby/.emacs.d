@@ -1,4 +1,7 @@
-(setq mac-command-modifier 'control)
+(setq mac-command-modifier 'control
+      mac-option-modifier      'meta
+      mac-right-option-modifier 'hyper
+      mac-control-modifier 'hyper)
 
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
@@ -61,6 +64,8 @@
 ;; (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 ;; This is on probation to break habits of escaping windows
 (global-set-key (kbd "<escape>") 'keyboard-quit)
+
+(global-set-key (kbd "M-o") 'other-window)
 
 (setq tramp-default-method "ssh")
 
