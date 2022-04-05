@@ -98,6 +98,11 @@
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings))
 
+;; https://emacs.stackexchange.com/a/5604
+;; Allows assigning a copy target in dired based on other open dired buffers.
+;; Try opening a folder, then another folder, then C on a directory to move.
+(setq dired-dwim-target 1)
+
 (global-prettify-symbols-mode 1)
 
 ;; END emacs things not related to specific packages
@@ -131,6 +136,25 @@
 (use-package dired-subtree
   :defer t
   :bind ([remap dired-maybe-insert-subdir] . dired-subtree-cycle))
+
+(use-package dired-filter
+  :defer t
+  :init
+  (setq dired-filter-group-saved-groups '(("default"
+                                           ("Directories"
+                                            (directory))
+                                           ("Clojure"
+                                            (extension "clj" "cljs" "cljc" "edn")))))
+  :hook ((dired-mode . dired-filter-group-mode))
+  :custom
+  (dired-filter-prefix "H-d f"))
+
+(use-package dired-narrow
+  ;; Needs to come after dired-filter so the / keybind isn't overwritten
+  :after dired-filter
+  :defer t
+  :bind (:map dired-mode-map
+              ("/" . dired-narrow)))
 
 (use-package diminish)
 
