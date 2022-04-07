@@ -105,7 +105,14 @@
 
 (global-prettify-symbols-mode 1)
 
+;; https://emacs.stackexchange.com/a/9411
+(setq-default ediff-forward-word-function 'forward-char)
+
 ;; END emacs things not related to specific packages
+
+(use-package expand-region
+  :bind (("C-=" . er/expand-region)
+         ("C--" . er/contract-region)))
 
 (use-package undo-tree
   :custom
@@ -207,6 +214,13 @@
   ;; Disabled due to incompatibility with nREPL (why??)
   ;; TODO: fix
   ;;(setq cider-print-fn "pprint")
+  (setq cider-print-fn "user/pprint")
+
+  (setq cider-repl-buffer-size-limit 100000)
+
+  (setq cider-prompt-for-symbol t)
+
+  (setq cider-stacktrace-default-filters '(project))
   
   (require 'flycheck-clj-kondo))
 
