@@ -53,7 +53,8 @@
 ;; Hey, it's a nice looking font
 (set-face-attribute
  'default nil
- :font "Fantasque Sans Mono")
+ :font "Fantasque Sans Mono"
+ :height 160)
 
 (set-default-coding-systems 'utf-8)
 
@@ -66,6 +67,10 @@
 (global-set-key (kbd "<escape>") 'keyboard-quit)
 
 (global-set-key (kbd "M-o") 'other-window)
+
+(global-set-key (kbd "<f6>") 'xref-find-definitions)
+
+(global-set-key (kbd "H-s") 'window-swap-state)
 
 (setq tramp-default-method "ssh")
 
@@ -103,10 +108,14 @@
 ;; Try opening a folder, then another folder, then C on a directory to move.
 (setq dired-dwim-target 1)
 
+(setq dired-kill-when-opening-new-dired-buffer 1)
+
 (global-prettify-symbols-mode 1)
 
 ;; https://emacs.stackexchange.com/a/9411
 (setq-default ediff-forward-word-function 'forward-char)
+
+(setq read-minibuffer-restore-windows nil)
 
 ;; END emacs things not related to specific packages
 
@@ -205,52 +214,49 @@
 (use-package yasnippet-snippets)
 
 ;; BEGIN clojure
+
 (use-package flycheck-clj-kondo
   :config
   (global-flycheck-mode))
 
 (use-package clojure-mode
   :config
-  ;; Disabled due to incompatibility with nREPL (why??)
-  ;; TODO: fix
-  ;;(setq cider-print-fn "pprint")
-  (setq cider-print-fn "user/pprint")
-
-  (setq cider-repl-buffer-size-limit 100000)
-
-  (setq cider-prompt-for-symbol t)
-
-  (setq cider-stacktrace-default-filters '(project))
-  
   (require 'flycheck-clj-kondo))
 
 (use-package cider
   :config
   ;; Prevent cider from showing the error buffer automatically
-  (setq cider-show-error-buffer nil)
+  (setq cider-show-error-buffer nil
 
-  ;; Prevent cider from jumping to the error buffer
-  (setq cider-auto-select-error-buffer nil)
+        ;; Prevent cider from jumping to the error buffer
+        cider-auto-select-error-buffer nil
 
-  ;; Prevent cider from creating new windows for ** buffers
-  (setq nrepl-hide-special-buffers t)
+        ;; Prevent cider from creating new windows for ** buffers
+        nrepl-hide-special-buffers t
 
-  ;; Provide syntax highlighting for user defined symbols
-  (setq cider-font-lock-dynamically '(macro core function var))
+        ;; Provide syntax highlighting for user defined symbols
+        cider-font-lock-dynamically '(macro core)
 
-  ;; I would like to use xref but ctag generation was not finding clojure function definitions because ???
-  ;;(setq cider-use-xref nil)
+        ;; Put the eval overlay with the expression
+        cider-result-overlay-position 'at-point
 
-  ;; Make tab provide completions if code is already indented
-  ;; Note that M-TAB does this by default if M-TAB isn't used for switching windows through the OS windowing system
-  (setq tab-always-indent 'complete)
+        cider-repl-use-pretty-printing t
+        cider-print-fn "user/pprint"
 
-  (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
-  
+        cider-repl-buffer-size-limit 100000
+
+        cider-prompt-for-symbol t
+
+        cider-stacktrace-default-filters '(project)
+
+        ;; I really like having this show up for both success and failure.
+        ;; 'q' to close.
+        cider-test-show-report-on-success t)
+
   ;; Provide fuzzy matching for completions
   (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
   (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
-  
+
   ;; A function for starting cider with a profile selected
   ;; See https://stackoverflow.com/questions/18304271/how-do-i-choose-switch-leiningen-profiles-with-emacs-nrepl
   (defun start-cider-repl-with-profile ()
@@ -308,6 +314,10 @@
 
 (use-package magit-todos
   :defer t)
+
+(use-package git-gutter
+  :config
+  (global-git-gutter-mode 1))
 
 ;; ESHELL
 (use-package exec-path-from-shell
@@ -423,9 +433,9 @@
   (global-whitespace-mode 0))
 
 (use-package which-key
-  :init (which-key-mode)
   :config
-  (setq which-key-idle-delay 0.3))
+  (setq which-key-idle-delay 0.3)
+  (which-key-mode))
 
 (use-package eldoc-mode
   :straight nil
