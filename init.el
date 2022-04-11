@@ -110,6 +110,8 @@
 
 (setq dired-kill-when-opening-new-dired-buffer 1)
 
+(setq dired-listing-switches "-alh")
+
 (global-prettify-symbols-mode 1)
 
 ;; https://emacs.stackexchange.com/a/9411
