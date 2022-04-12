@@ -151,6 +151,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Package configuration
 
+(use-package dash)
+
 ;; Packages to only use when using macos
 (when using-macp
   (use-package launchctl))
@@ -368,6 +370,18 @@
     (exec-path-from-shell-copy-env "VISUAL")
     (exec-path-from-shell-copy-env "EDITOR")
     (exec-path-from-shell-initialize)))
+
+(use-package with-editor
+  :hook ((shell-mode . 'with-editor-export-editor)
+         (shell-mode . 'with-editor-export-git-editor)
+         (eshell-mode . 'with-editor-export-editor)
+         (term-exec-mode . 'with-editor-export-editor)
+         (vterm-mode . 'with-editor-export-editor))
+  :config
+  (define-key (current-global-map)
+    [remap async-shell-command] 'with-editor-async-shell-command)
+  (define-key (current-global-map)
+    [remap shell-command] 'with-editor-shell-command))
 
 (use-package eshell-git-prompt)
 
