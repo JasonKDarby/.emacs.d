@@ -348,6 +348,7 @@
 (use-package ivy
   :bind (("C-s" . swiper)
          ("C-r" . swiper-backward)
+         ("H-s" . swiper-thing-at-point)
          :map ivy-minibuffer-map
 	       ("TAB" . ivy-alt-done)
 	       ;; binds go here
@@ -398,6 +399,7 @@
          ("<f1> l" . counsel-find-library)
          ("<f2> i" . counsel-info-lookup-symbol)
          ("<f2> u" . counsel-unicode-char)
+         ("M-y" . counsel-yank-pop)
 	       :map minibuffer-local-map
 	       ("C-r" . 'counsel-minibuffer-history))
   :config
