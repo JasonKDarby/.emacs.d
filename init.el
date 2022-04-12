@@ -1,31 +1,27 @@
-(setq mac-command-modifier 'control
-      mac-option-modifier      'meta
-      mac-right-option-modifier 'hyper
-      mac-control-modifier 'hyper)
+;;; init.el --- Emacs initialization
+;;
+;;; Commentary:
+;; This is my personal configuration, primarily for Clojure development on macos.
+;; It should work on Linux and Windows as well.
+;;
+;;; Code:
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Vanilla Emacs configuration
+
+(defvar using-macp
+  (memq window-system '(mac ns x)))
+
+(when using-macp
+  (setq mac-command-modifier 'control
+        mac-option-modifier      'meta
+        mac-right-option-modifier 'hyper
+        mac-control-modifier 'hyper))
+
+(set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
-
-(setq package-enable-at-startup nil)
-
-
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-(straight-use-package 'use-package)
-
-(setq straight-use-package-by-default t)
 
 ;; Delete by moving to trash instead of just poof
 (setq-default delete-by-moving-to-trash t)
@@ -47,7 +43,7 @@
 ;; Disable the startup screen
 (setq inhibit-startup-message t)
 
-;; Turn on line numberscoun
+;; Turn off line numberscount
 (global-display-line-numbers-mode 0)
 
 ;; Hey, it's a nice looking font
@@ -55,8 +51,6 @@
  'default nil
  :font "Fantasque Sans Mono"
  :height 160)
-
-(set-default-coding-systems 'utf-8)
 
 ;; Delete selected text with what you type
 (delete-selection-mode 1)
@@ -70,9 +64,7 @@
 
 (global-set-key (kbd "<f6>") 'xref-find-definitions)
 
-(global-set-key (kbd "H-s") 'window-swap-state)
-
-(setq tramp-default-method "ssh")
+(defvar tramp-default-method "ssh")
 
 ;; Default indent size to 2 spaces
 (setq-default tab-width 2)
@@ -97,6 +89,7 @@
 (dolist (command '(scroll-up-command scroll-down-command
                                      recenter-top-bottom other-window))
   (advice-add command :after #'pulse-line))
+
 ;; https://www.emacswiki.org/emacs/WindMove
 ;; Shift+arrow will move to buffers directionally
 ;; Note that this works even if arrow keys are unbound (because it's a modifier + key)
@@ -106,9 +99,9 @@
 ;; https://emacs.stackexchange.com/a/5604
 ;; Allows assigning a copy target in dired based on other open dired buffers.
 ;; Try opening a folder, then another folder, then C on a directory to move.
-(setq dired-dwim-target 1)
+(defvar dired-dwim-target 1)
 
-(setq dired-kill-when-opening-new-dired-buffer 1)
+(defvar dired-kill-when-opening-new-dired-buffer 1)
 
 (setq dired-listing-switches "-alh")
 
@@ -119,7 +112,48 @@
 
 (setq read-minibuffer-restore-windows nil)
 
-;; END emacs things not related to specific packages
+;; Useful functions
+(defun remove-dos-eol ()
+  "Do not show ^M in files containing mixed UNIX and DOS line endings."
+  (interactive)
+  (setq buffer-display-table (make-display-table))
+  (aset buffer-display-table ?\^M []))
+
+;; put auto generated custom information into a separate file
+(setq custom-file "~/.emacs.d/custom.el")
+(cond ((file-directory-p custom-file)
+       (load custom-file))
+      (t (progn
+           (write-region "" nil custom-file)
+           (load custom-file))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Package management setup
+
+(setq package-enable-at-startup nil)
+(defvar straight-use-package-by-default t)
+
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(straight-use-package 'use-package)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Package configuration
+
+;; Packages to only use when using macos
+(when using-macp
+  (use-package launchctl))
 
 (use-package expand-region
   :bind (("C-=" . er/expand-region)
@@ -324,7 +358,7 @@
 ;; ESHELL
 (use-package exec-path-from-shell
   :config
-  (when (memq window-system '(mac ns x))
+  (when using-macp
     (setq ls-lisp-use-insert-directory-program nil)
     (require 'ls-lisp)
 
@@ -454,17 +488,4 @@
   :config
   (global-disable-mouse-mode))
 
-;; Useful functions
-(defun remove-dos-eol ()
-  "Do not show ^M in files containing mixed UNIX and DOS line endings."
-  (interactive)
-  (setq buffer-display-table (make-display-table))
-  (aset buffer-display-table ?\^M []))
-
-;; put auto generated custom information into a separate file
-(setq custom-file "~/.emacs.d/custom.el")
-(cond ((file-directory-p custom-file)
-       (load custom-file))
-      (t (progn
-           (write-region "" nil custom-file)
-           (load custom-file))))
+;;; init.el ends here
