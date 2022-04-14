@@ -4,6 +4,10 @@
 ;; This is my personal configuration, primarily for Clojure development on macos.
 ;; It should work on Linux and Windows as well.
 ;;
+;; Some modes require external dependencies.
+;; - doc-view-mode https://www.emacswiki.org/emacs/DocViewMode
+;; - flycheck-clj-kondo https://github.com/borkdude/flycheck-clj-kondo
+;;
 ;;; Code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -279,7 +283,6 @@
         cider-result-overlay-position 'at-point
 
         cider-repl-use-pretty-printing t
-        cider-print-fn "user/pprint"
 
         cider-repl-buffer-size-limit 100000
 
@@ -485,6 +488,8 @@
   (global-whitespace-mode 0))
 
 (use-package which-key
+  :bind
+  ([remap describe-mode] . which-key-show-major-mode)
   :config
   (setq which-key-idle-delay 0.3)
   (which-key-mode))
@@ -501,5 +506,10 @@
 (use-package disable-mouse
   :config
   (global-disable-mouse-mode))
+
+(setq company-specific-file "~/.emacs.d/company-specific.el")
+(cond ((file-exists-p company-specific-file)
+       (load company-specific-file))
+      (t (message "No company specific configuration found.")))
 
 ;;; init.el ends here
