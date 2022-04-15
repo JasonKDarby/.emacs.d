@@ -16,6 +16,9 @@
 (defvar using-macp
   (memq window-system '(mac ns x)))
 
+(defvar using-windowsp
+  (eq 'windows-nt system-type))
+
 (when using-macp
   (setq mac-command-modifier 'control
         mac-option-modifier      'meta
@@ -54,7 +57,9 @@
 (set-face-attribute
  'default nil
  :font "Fantasque Sans Mono"
- :height 160)
+ :height (cond (using-macp 160)
+               (using-windowsp 130))
+ :weight 'normal)
 
 ;; Delete selected text with what you type
 (delete-selection-mode 1)
