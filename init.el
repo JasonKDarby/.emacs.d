@@ -14,7 +14,7 @@
 ;; Vanilla Emacs configuration
 
 (defvar using-macp
-  (memq window-system '(mac ns x)))
+  (eq 'darwin system-type))
 
 (when using-macp
   (setq mac-command-modifier 'control
@@ -161,6 +161,8 @@
 (when using-macp
   (use-package launchctl))
 
+(use-package csv-mode)
+
 (use-package expand-region
   :bind (("C-=" . er/expand-region)
          ("C--" . er/contract-region)))
@@ -263,6 +265,7 @@
 
 (use-package clojure-mode
   :config
+  (setq clojure-indent-style 'always-align)
   (require 'flycheck-clj-kondo))
 
 (use-package cider
@@ -297,6 +300,9 @@
   ;; Provide fuzzy matching for completions
   (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
   (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
+
+  ;; Auto-scroll REPL on output
+  (add-hook 'cider-repl-mode-hook '(lambda () (setq scroll-conservatively 101)))
 
   ;; A function for starting cider with a profile selected
   ;; See https://stackoverflow.com/questions/18304271/how-do-i-choose-switch-leiningen-profiles-with-emacs-nrepl
@@ -355,6 +361,8 @@
 
 (use-package magit-todos
   :defer t)
+
+(use-package git-timemachine)
 
 (use-package git-gutter
   :config
@@ -436,6 +444,7 @@
   :bind (("M-x" . counsel-M-x)
 	       ("C-x b" . counsel-ibuffer)
 	       ("C-x C-f" . counsel-find-file)
+         ([remap bookmark-jump] . counsel-bookmark)
 	       ("C-M-j" . counsel-switch-buffer)
 	       ("C-M-l" . counsel-imenu)
          ("C-c g" . counsel-git)
