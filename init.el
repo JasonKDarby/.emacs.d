@@ -508,6 +508,8 @@
   :config
   (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode))
 
+(use-package hackernews)
+
 (use-package disable-mouse
   :config
   (global-disable-mouse-mode))
