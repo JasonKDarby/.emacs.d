@@ -23,6 +23,7 @@
   (setq mac-command-modifier 'control
         mac-option-modifier      'meta
         mac-right-option-modifier 'hyper
+        mac-right-command-modifier 'super
         mac-control-modifier 'hyper))
 
 (set-default-coding-systems 'utf-8)
@@ -367,7 +368,11 @@
 (use-package magit-todos
   :defer t)
 
+;; Allows walking through changes
 (use-package git-timemachine)
+
+;; Provides links to remote repos
+(use-package git-link)
 
 (use-package git-gutter
   :config
@@ -465,10 +470,12 @@
          ("<f2> i" . counsel-info-lookup-symbol)
          ("<f2> u" . counsel-unicode-char)
          ("M-y" . counsel-yank-pop)
+         ("s-s" . counsel-projectile-ag)
 	       :map minibuffer-local-map
 	       ("C-r" . 'counsel-minibuffer-history))
   :config
-  (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
+  (setq ivy-initial-inputs-alist nil) ;; Don't start searches with ^
+  (setq counsel-projectile-ag-initial-input '(ivy-thing-at-point))) ;; Prefill ag with thing-at-point
 
 (use-package counsel-projectile
   :after projectile
