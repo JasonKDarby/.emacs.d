@@ -19,12 +19,24 @@
 (defvar using-windowsp
   (eq 'windows-nt system-type))
 
+;; Note my keybinds are meant for the Kinesis Advantage 2.
+
 (when using-macp
   (setq mac-command-modifier 'control
         mac-option-modifier      'meta
         mac-right-option-modifier 'hyper
         mac-right-command-modifier 'super
         mac-control-modifier 'hyper))
+
+(when using-windowsp
+  (setq w32-rwindow-modifier 'hyper)
+
+  ;; Emacs doesn't differentiate left/right ctrl for windows so this depends on right ctrl
+  ;; being rebound to f13.  It doesn't actually simulate the super keypress but it uses the
+  ;; effect.  I'm not sure if there's a practical or actual difference.
+  (define-key key-translation-map (kbd "<f13>") 'event-apply-super-modifier)
+
+  (w32-register-hot-key [H-]))
 
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
