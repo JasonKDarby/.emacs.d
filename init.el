@@ -239,12 +239,11 @@
 (use-package paredit
   :hook ((clojure-mode . paredit-mode)
          (clojurescript-mode . paredit-mode)
-         (cider-mode . paredit-mode)
-         (cider-repl-mode . paredit-mode)
          (emacs-lisp-mode . paredit-mode)
          (lisp-mode . paredit-mode)
          (lisp-interaction-mode . paredit-mode)
-         (scheme-mode . paredit-mode))
+         (scheme-mode . paredit-mode)
+         (inf-clojure-mode . paredit-mode))
   :config
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
   (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
@@ -282,69 +281,52 @@
   (global-flycheck-mode))
 
 (use-package clojure-mode
+  :hook ((clojure-mode . eldoc-mode))
+  :bind (
+         :map clojure-mode-map
+         ("\C-c\C-k" . 'reload-current-clj-ns)
+         ("\M-." . 'find-tag-without-ns)
+         ("\C-cl" . 'erase-inf-buffer)
+         ("\C-c\C-t" . 'clojure-toggle-keyword-string))
   :config
   (setq clojure-indent-style 'always-align)
   (require 'flycheck-clj-kondo))
 
-(use-package cider
+;; See https://martintrojer.github.io/clojure/2015/02/14/clojure-and-emacs-without-cider-redux
+(use-package inf-clojure
+  :hook ((clojure-mode . inf-clojure-minor-mode)
+         (inf-clojure-minor-mode . eldoc-mode))
+  :bind (
+         :map inf-clojure-mode-map
+         ("\C-cl" . 'erase-inf-buffer))
   :config
-  ;; Prevent cider from showing the error buffer automatically
-  (setq cider-show-error-buffer nil
+  (setq inf-clojure-prompt-read-only nil)
 
-        ;; Prevent cider from jumping to the error buffer
-        cider-auto-select-error-buffer nil
+  ;; prevent company-mode from freezing Emacs when the REPL is busy
+  (add-hook 'inf-clojure-minor-mode-hook (lambda () (setq completion-at-point-functions nil)))
 
-        ;; Prevent cider from creating new windows for ** buffers
-        nrepl-hide-special-buffers t
+  (defun reload-current-clj-ns (next-p)
+    (interactive "P")
+    (let ((ns (clojure-find-ns)))
+      (message (format "Loading %s ..." ns))
+      (inf-clojure-eval-string (format "(require '%s :reload)" ns))
+      (when (not next-p) (inf-clojure-eval-string (format "(in-ns '%s)" ns)))))
 
-        ;; Provide syntax highlighting for user defined symbols
-        cider-font-lock-dynamically '(macro core)
+  (defun find-tag-without-ns (next-p)
+    (interactive "P")
+    (find-tag (first (last (split-string (symbol-name (symbol-at-point)) "/")))
+              next-p))
 
-        ;; Put the eval overlay with the expression
-        cider-result-overlay-position 'at-point
-
-        cider-repl-use-pretty-printing t
-
-        cider-repl-buffer-size-limit 100000
-
-        cider-prompt-for-symbol t
-
-        cider-stacktrace-default-filters '(project)
-
-        ;; I really like having this show up for both success and failure.
-        ;; 'q' to close.
-        cider-test-show-report-on-success t)
-
-  ;; Provide fuzzy matching for completions
-  (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
-  (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
-
-  ;; Auto-scroll REPL on output
-  (add-hook 'cider-repl-mode-hook '(lambda () (setq scroll-conservatively 101)))
-
-  ;; A function for starting cider with a profile selected
-  ;; See https://stackoverflow.com/questions/18304271/how-do-i-choose-switch-leiningen-profiles-with-emacs-nrepl
-  (defun start-cider-repl-with-profile ()
+  (defun erase-inf-buffer ()
     (interactive)
-    (letrec ((profile (read-string "Enter profile name: "))
-             (lein-params (concat "with-profile +" profile " repl :headless")))
-      (message "lein-params set to: %s" lein-params)
-      (set-variable 'cider-lein-parameters lein-params)
-      (cider-jack-in '()))))
-
-(use-package clj-decompiler
-  :config
-  (add-hook 'cider-mode-hook
-            (lambda ()
-              (eval-after-load 'cider
-                '(progn
-                   (require 'clj-decompiler)
-                   (clj-decompiler-setup))))))
+    (with-current-buffer (get-buffer "*inf-clojure*")
+      (erase-buffer))
+    (inf-clojure-eval-string "")))
 
 (use-package clj-refactor
   :hook ((clojure-mode . clj-refactor-mode)
          (clojure-mode . yas-minor-mode))
-  :config (cljr-add-keybindings-with-prefix "C-c C-m"))
+  :config (cljr-add-keybindings-with-prefix "C-c C-o"))
 
 ;; END clojure
 
@@ -363,10 +345,9 @@
 
 (use-package rainbow-delimiters
   :hook ((clojure-mode . rainbow-delimiters-mode)
-         (cider-mode . rainbow-delimiters-mode)
-         (cider-repl-mode . rainbow-delimiters-mode)
-         (emacs-lisp-mode . rainbow-delimiters-mode))
-  :config (add-hook 'eval-expression-minibuffer-setup-hook #'rainbow-delimiters-mode))
+         (inf-clojure-mode . rainbow-delimiters-mode)
+         (emacs-lisp-mode . rainbow-delimiters-mode)
+         (eval-expression-minibuffer-setup . rainbow-delimiters-mode)))
 
 (use-package magit
   :bind ("C-M-;" . magit-status)
@@ -530,8 +511,7 @@
 (use-package eldoc-mode
   :straight nil
   :hook ((clojure-mode . eldoc-mode)
-         (cider-mode . eldoc-mode)
-         (cider-repl-mode . eldoc-mode)
+         (inf-clojure-minor-mode . eldoc-mode)
          (emacs-lisp-mode . eldoc-mode))
   :config
   (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode))
