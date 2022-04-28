@@ -107,3 +107,5 @@ ido.last
 recentf
 company-specific.el
 hackernews/
+eln-cache/
+projects
