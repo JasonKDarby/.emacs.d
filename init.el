@@ -243,15 +243,15 @@
          (lisp-mode . paredit-mode)
          (lisp-interaction-mode . paredit-mode)
          (scheme-mode . paredit-mode)
-         (inf-clojure-mode . paredit-mode))
+         (inf-clojure-mode . paredit-mode)
+         (inf-clojure-minor-mode . paredit-mode))
   :config
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
   (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
   (show-paren-mode t))
 
 (use-package paredit-everywhere
-  :config
-  (add-hook 'prog-mode-hook 'paredit-everywhere-mode))
+  :hook ((prog-mode . paredit-everywhere-mode)))
 
 (use-package indent-guide
   :config
@@ -281,54 +281,58 @@
   (global-flycheck-mode))
 
 (use-package clojure-mode
-  :hook ((clojure-mode . eldoc-mode))
   :bind (
          :map clojure-mode-map
          ("\C-c\C-k" . 'reload-current-clj-ns)
-         ("\M-." . 'find-tag-without-ns)
-         ("\C-cl" . 'erase-inf-buffer)
-         ("\C-c\C-t" . 'clojure-toggle-keyword-string))
+         ("\C-cl" . 'inf-clojure-erase-buffer)
+         ("\C-c\C-tn" . 'inf-clojure-run-tests-in-ns)
+         ("\C-c\C-t\C-n" . 'inf-clojure-run-tests-in-ns))
   :config
   (setq clojure-indent-style 'always-align)
   (require 'flycheck-clj-kondo))
 
 ;; See https://martintrojer.github.io/clojure/2015/02/14/clojure-and-emacs-without-cider-redux
 (use-package inf-clojure
-  :hook ((clojure-mode . inf-clojure-minor-mode)
-         (inf-clojure-minor-mode . eldoc-mode))
+  :hook ((clojure-mode . inf-clojure-minor-mode))
   :bind (
          :map inf-clojure-mode-map
-         ("\C-cl" . 'erase-inf-buffer))
+         ("\C-cl" . 'inf-clojure-erase-buffer))
   :config
   (setq inf-clojure-prompt-read-only nil)
 
+  ;; Use compliment https://github.com/alexander-yakushev/compliment for clojure completions
+  (inf-clojure-update-feature 'clojure 'completion "(compliment.core/completions \"%s\")")
+
+  (inf-clojure-update-feature 'clojure 'arglists "(try (:arglists (clojure.core/meta (clojure.core/resolve
+(clojure.core/read-string \"%s\")))) (catch Throwable t nil))")
+
   ;; prevent company-mode from freezing Emacs when the REPL is busy
-  (add-hook 'inf-clojure-minor-mode-hook (lambda () (setq completion-at-point-functions nil)))
+  ;; (add-hook 'inf-clojure-minor-mode-hook (lambda () (setq completion-at-point-functions nil)))
 
   (defun reload-current-clj-ns (next-p)
     (interactive "P")
     (let ((ns (clojure-find-ns)))
       (message (format "Loading %s ..." ns))
-      (inf-clojure-eval-string (format "(require '%s :reload)" ns))
-      (when (not next-p) (inf-clojure-eval-string (format "(in-ns '%s)" ns)))))
+      (inf-clojure-eval-string (format "(do (require '%s :reload) (in-ns '%s))" ns ns))))
 
-  (defun find-tag-without-ns (next-p)
-    (interactive "P")
-    (find-tag (first (last (split-string (symbol-name (symbol-at-point)) "/")))
-              next-p))
-
-  (defun erase-inf-buffer ()
+  (defun inf-clojure-erase-buffer ()
     (interactive)
     (with-current-buffer (get-buffer "*inf-clojure*")
       (erase-buffer))
-    (inf-clojure-eval-string "")))
+    (inf-clojure-eval-string ""))
 
-(use-package clj-refactor
-  :hook ((clojure-mode . clj-refactor-mode)
-         (clojure-mode . yas-minor-mode))
-  :config (cljr-add-keybindings-with-prefix "C-c C-o"))
+  (defun inf-clojure-run-tests-in-ns ()
+    (interactive)
+    (let ((ns (clojure-find-ns)))
+      (message (format "Running tests in %s ..." ns))
+      (inf-clojure-eval-string (format "(do (use 'clojure.test) (run-tests '%s))" ns)))))
 
 ;; END clojure
+
+(use-package dumb-jump
+  :hook ((xref-backend-functions . dumb-jump-xref-activate))
+  :config
+  (setq xref-show-definitions-function #'xref-show-definitions-completing-read))
 
 (use-package json-mode
   :defer 20
@@ -338,10 +342,6 @@
   (:package json-mode-map
             :map json-mode-map
             ("C-c <tab>" . json-mode-beautify)))
-
-(use-package diminish
-  :config
-  (diminish 'eldoc-mode))
 
 (use-package rainbow-delimiters
   :hook ((clojure-mode . rainbow-delimiters-mode)
@@ -386,20 +386,17 @@
     (exec-path-from-shell-initialize)))
 
 (use-package with-editor
-  :hook ((shell-mode . 'with-editor-export-editor)
-         (shell-mode . 'with-editor-export-git-editor)
-         (eshell-mode . 'with-editor-export-editor)
-         (term-exec-mode . 'with-editor-export-editor)
-         (vterm-mode . 'with-editor-export-editor))
-  :config
-  (define-key (current-global-map)
-    [remap async-shell-command] 'with-editor-async-shell-command)
-  (define-key (current-global-map)
-    [remap shell-command] 'with-editor-shell-command))
+  :demand t
+  ;; TODO: running these commands results in with-editor trying to be invoked as a function but is void
+  :bind (([remap async-shell-command] . 'with-editor-async-shell-command)
+         ([remap shell-command] . 'with-editor-shell-command)))
 
 (use-package eshell-git-prompt)
 
 (use-package eshell
+  :requires with-editor
+  :hook ((eshell-mode . 'with-editor-export-editor)
+         (eshell-mode . 'with-editor-export-git-editor))
   :config
   (eshell-git-prompt-use-theme 'git-radar))
 
@@ -487,8 +484,13 @@
   ([remap describe-key] . helpful-key))
 
 (use-package aggressive-indent
+  :hook ((emacs-lisp-mode . aggressive-indent-mode)
+         (clojure-mode . aggressive-indent-mode)
+         (inf-clojure-mode . aggressive-indent-mode))
   :config
-  (global-aggressive-indent-mode 1))
+  ;; A temporary fix to prevent messages from being logged to the buffer as of Emacs 28.
+  ;; See https://github.com/Malabarba/aggressive-indent-mode/pull/148
+  (setq aggressive-indent-region-function #'(lambda (x y) (let ((inhibit-message t)) (indent-region x y)))))
 
 ;; Contains functions for moving to the beginning/end of line
 (use-package mwim
@@ -507,14 +509,6 @@
   :config
   (setq which-key-idle-delay 0.3)
   (which-key-mode))
-
-(use-package eldoc-mode
-  :straight nil
-  :hook ((clojure-mode . eldoc-mode)
-         (inf-clojure-minor-mode . eldoc-mode)
-         (emacs-lisp-mode . eldoc-mode))
-  :config
-  (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode))
 
 (use-package hackernews)
 
