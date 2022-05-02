@@ -293,6 +293,7 @@
 
 ;; See https://martintrojer.github.io/clojure/2015/02/14/clojure-and-emacs-without-cider-redux
 (use-package inf-clojure
+  :requires clojure-mode
   :hook ((clojure-mode . inf-clojure-minor-mode))
   :bind (
          :map inf-clojure-mode-map
@@ -321,6 +322,16 @@
       (erase-buffer))
     (inf-clojure-eval-string ""))
 
+  (defun inf-clojure-run-current-test ()
+    (interactive)
+    (pcase-let ((`(,declaration-macro ,symbol-name) (clojure-find-def)))
+      (when (string= declaration-macro "deftest")
+        (let ((ns (clojure-find-ns)))
+          (message (format "Running test %s/%s ..." ns symbol-name))
+          (inf-clojure-eval-string (format
+                                    "(do (use 'clojure.test) (clojure.test/test-vars [#'%s/%s]))"
+                                    ns symbol-name ns))))))
+  
   (defun inf-clojure-run-tests-in-ns ()
     (interactive)
     (let ((ns (clojure-find-ns)))
