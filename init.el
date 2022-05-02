@@ -286,7 +286,9 @@
          ("\C-c\C-k" . 'reload-current-clj-ns)
          ("\C-cl" . 'inf-clojure-erase-buffer)
          ("\C-c\C-tn" . 'inf-clojure-run-tests-in-ns)
-         ("\C-c\C-t\C-n" . 'inf-clojure-run-tests-in-ns))
+         ("\C-c\C-t\C-n" . 'inf-clojure-run-tests-in-ns)
+         ("\C-c\C-tt" . 'inf-clojure-run-current-test)
+         ("\C-c\C-t\C-t" . 'inf-clojure-run-current-test))
   :config
   (setq clojure-indent-style 'always-align)
   (require 'flycheck-clj-kondo))
