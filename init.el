@@ -244,14 +244,12 @@
          (lisp-interaction-mode . paredit-mode)
          (scheme-mode . paredit-mode)
          (inf-clojure-mode . paredit-mode)
-         (inf-clojure-minor-mode . paredit-mode))
+         (inf-clojure-minor-mode . paredit-mode)
+         (lisp-data-mode . paredit-mode))
   :config
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
   (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
   (show-paren-mode t))
-
-(use-package paredit-everywhere
-  :hook ((prog-mode . paredit-everywhere-mode)))
 
 (use-package indent-guide
   :config
@@ -296,10 +294,15 @@
 ;; See https://martintrojer.github.io/clojure/2015/02/14/clojure-and-emacs-without-cider-redux
 (use-package inf-clojure
   :requires clojure-mode
+  ;; While not generally necessary to demand inf-clojure I need it to be present for
+  ;; company-specific.el.
+  :demand t
   :hook ((clojure-mode . inf-clojure-minor-mode))
   :bind (
          :map inf-clojure-mode-map
-         ("\C-cl" . 'inf-clojure-erase-buffer))
+         ("\C-cl" . 'inf-clojure-erase-buffer)
+         ("{" . #'paredit-open-curly)
+         ("}" . #'paredit-close-curly))
   :config
   (setq inf-clojure-prompt-read-only nil)
 
@@ -327,18 +330,23 @@
   (defun inf-clojure-run-current-test ()
     (interactive)
     (pcase-let ((`(,declaration-macro ,symbol-name) (clojure-find-def)))
-      (when (string= declaration-macro "deftest")
-        (let ((ns (clojure-find-ns)))
-          (message (format "Running test %s/%s ..." ns symbol-name))
-          (inf-clojure-eval-string (format
-                                    "(do (use 'clojure.test) (clojure.test/test-vars [#'%s/%s]))"
-                                    ns symbol-name ns))))))
+      (let ((ns (clojure-find-ns)))
+        (if (string= declaration-macro "deftest")
+            (progn (message (format "Running test %s/%s ..." ns symbol-name))
+                   (inf-clojure-eval-string (format
+                                             "(do (use 'clojure.test) (clojure.test/test-vars [#'%s/%s]))"
+                                             ns symbol-name ns)))
+          (message (format "%s/%s was created using %s, not deftest" ns symbol-name declaration-macro))))))
   
   (defun inf-clojure-run-tests-in-ns ()
     (interactive)
     (let ((ns (clojure-find-ns)))
       (message (format "Running tests in %s ..." ns))
-      (inf-clojure-eval-string (format "(do (use 'clojure.test) (run-tests '%s))" ns)))))
+      (inf-clojure-eval-string (format "(do (use 'clojure.test) (run-tests '%s))" ns))))
+
+  (defun inf-clojure-toggle-log-activity ()
+    (interactive)
+    (setq inf-clojure-log-activity (not inf-clojure-log-activity))))
 
 ;; END clojure
 
