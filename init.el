@@ -343,8 +343,10 @@
 ;; END clojure
 
 (use-package dumb-jump
-  :hook ((xref-backend-functions . dumb-jump-xref-activate))
   :config
+  ;; This does not work with use-package :hook, I think because it registers it as
+  ;; xref-backend-functions-hook.
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
   (setq xref-show-definitions-function #'xref-show-definitions-completing-read))
 
 (use-package json-mode
