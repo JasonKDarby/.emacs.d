@@ -305,7 +305,8 @@
          :map inf-clojure-mode-map
          ("\C-cl" . 'inf-clojure-erase-buffer)
          ("{" . #'paredit-open-curly)
-         ("}" . #'paredit-close-curly))
+         ("}" . #'paredit-close-curly)
+         :map inf-clojure-minor-mode)
   :config
   ;; This is the default, not sure why you wouldn't want it to be read-only.
   (setq inf-clojure-prompt-read-only t)
