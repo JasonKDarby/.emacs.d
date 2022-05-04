@@ -310,8 +310,6 @@
   ;; This is the default, not sure why you wouldn't want it to be read-only.
   (setq inf-clojure-prompt-read-only t)
 
-  (add-hook 'inf-clojure-mode-hook (lambda () (font-lock-mode -1)))
-
   ;; Use compliment https://github.com/alexander-yakushev/compliment for clojure completions
   (inf-clojure-update-feature 'clojure 'completion "(compliment.core/completions \"%s\")")
 
