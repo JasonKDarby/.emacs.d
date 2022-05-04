@@ -256,15 +256,15 @@
   (indent-guide-global-mode))
 
 (use-package company
+  :hook (prog-mode . company-mode)
+  :bind (("<backtab>" . company-complete-common))
   :config
   ;; Makes autocomplete return uppercase if the completion calls for it
   (setq company-dabbrev-downcase 0)
 
   ;; Set company settings according to https://github.com/clojure-lsp/clojure-lsp/issues/884 for performance
   (setq company-minimum-prefix-length 2)
-  (setq company-idle-delay 0.2)
-
-  (global-company-mode))
+  (setq company-idle-delay 0.2))
 
 (use-package yasnippet
   :config
@@ -293,18 +293,24 @@
 
 ;; See https://martintrojer.github.io/clojure/2015/02/14/clojure-and-emacs-without-cider-redux
 (use-package inf-clojure
-  :requires clojure-mode
+  :requires (clojure-mode visual-line-mode)
   ;; While not generally necessary to demand inf-clojure I need it to be present for
   ;; company-specific.el.
   :demand t
-  :hook ((clojure-mode . inf-clojure-minor-mode))
+  :hook ((clojure-mode . inf-clojure-minor-mode)
+         ;; Prevents emacs from becoming unresponsive with giant lines.
+         ;; ...But at what cost?
+         (inf-clojure-mode . visual-line-mode))
   :bind (
          :map inf-clojure-mode-map
          ("\C-cl" . 'inf-clojure-erase-buffer)
          ("{" . #'paredit-open-curly)
          ("}" . #'paredit-close-curly))
   :config
-  (setq inf-clojure-prompt-read-only nil)
+  ;; This is the default, not sure why you wouldn't want it to be read-only.
+  (setq inf-clojure-prompt-read-only t)
+
+  (add-hook 'inf-clojure-mode-hook (lambda () (font-lock-mode -1)))
 
   ;; Use compliment https://github.com/alexander-yakushev/compliment for clojure completions
   (inf-clojure-update-feature 'clojure 'completion "(compliment.core/completions \"%s\")")
@@ -342,11 +348,11 @@
     (interactive)
     (let ((ns (clojure-find-ns)))
       (message (format "Running tests in %s ..." ns))
-      (inf-clojure-eval-string (format "(do (use 'clojure.test) (run-tests '%s))" ns))))
+      (inf-clojure-eval-string (format "(do (use 'clojure.test) (run-tests '%s))" ns)))))
 
-  (defun inf-clojure-toggle-log-activity ()
-    (interactive)
-    (setq inf-clojure-log-activity (not inf-clojure-log-activity))))
+(defun inf-clojure-toggle-log-activity ()
+  (interactive)
+  (setq inf-clojure-log-activity (not inf-clojure-log-activity)))
 
 ;; END clojure
 
@@ -360,7 +366,6 @@
 (use-package json-mode
   :defer 20
   :custom (json-reformat:indent-width 2)
-  :mode ()
   :bind
   (:package json-mode-map
             :map json-mode-map
