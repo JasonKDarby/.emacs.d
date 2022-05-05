@@ -149,6 +149,15 @@
            (write-region "" nil custom-file)
            (load custom-file))))
 
+;; company-specific-file should contain a function named
+;; `apply-company-specific-configuration' that takes `PACKAGE'
+;; as an argument and executes company specific configuration.
+(setq company-specific-file "~/.emacs.d/company-specific.el")
+(cond ((file-exists-p company-specific-file)
+       (load company-specific-file))
+      (t (message "No company specific configuration found.")))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Package management setup
 
@@ -462,6 +471,7 @@
   (setq projectile-switch-project-action #'projectile-dired)
   :config
   (projectile-mode)
+  (apply-company-specific-configuration 'projectile)
   :custom ((projectile-completion-system 'ivy))
   :bind-keymap
   ("C-c p" . projectile-command-map))
@@ -542,10 +552,5 @@
 (use-package disable-mouse
   :config
   (global-disable-mouse-mode))
-
-(setq company-specific-file "~/.emacs.d/company-specific.el")
-(cond ((file-exists-p company-specific-file)
-       (load company-specific-file))
-      (t (message "No company specific configuration found.")))
 
 ;;; init.el ends here
