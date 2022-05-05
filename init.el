@@ -302,10 +302,6 @@
 
 ;; See https://martintrojer.github.io/clojure/2015/02/14/clojure-and-emacs-without-cider-redux
 (use-package inf-clojure
-  :requires (clojure-mode visual-line-mode)
-  ;; While not generally necessary to demand inf-clojure I need it to be present for
-  ;; company-specific.el.
-  :demand t
   :hook ((clojure-mode . inf-clojure-minor-mode)
          ;; Prevents emacs from becoming unresponsive with giant lines.
          ;; ...But at what cost?
@@ -356,11 +352,13 @@
     (interactive)
     (let ((ns (clojure-find-ns)))
       (message (format "Running tests in %s ..." ns))
-      (inf-clojure-eval-string (format "(do (use 'clojure.test) (run-tests '%s))" ns)))))
+      (inf-clojure-eval-string (format "(do (use 'clojure.test) (run-tests '%s))" ns))))
 
-(defun inf-clojure-toggle-log-activity ()
-  (interactive)
-  (setq inf-clojure-log-activity (not inf-clojure-log-activity)))
+  (defun inf-clojure-toggle-log-activity ()
+    (interactive)
+    (setq inf-clojure-log-activity (not inf-clojure-log-activity)))
+
+  (apply-company-specific-configuration 'inf-clojure))
 
 ;; END clojure
 
