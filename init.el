@@ -319,17 +319,20 @@
   ;; Use compliment https://github.com/alexander-yakushev/compliment for clojure completions
   (inf-clojure-update-feature 'clojure 'completion "(compliment.core/completions \"%s\")")
 
-  (inf-clojure-update-feature 'clojure 'arglists "(try (:arglists (clojure.core/meta (clojure.core/resolve
-(clojure.core/read-string \"%s\")))) (catch Throwable t nil))")
+  (inf-clojure-update-feature 'clojure 'arglists "(try (:arglists (clojure.core/meta (clojure.core/resolve (clojure.core/read-string \"%s\")))) (catch Throwable t nil))")
 
-  ;; prevent company-mode from freezing Emacs when the REPL is busy
-  ;; (add-hook 'inf-clojure-minor-mode-hook (lambda () (setq completion-at-point-functions nil)))
+  (defun jdarb/buffer-substring-last-sexp ()
+    (buffer-substring-no-properties (save-excursion (backward-sexp) (point)) (point)))
 
+  (defun inf-clojure-rebl-inspect ()
+    (interactive)
+    (inf-clojure-eval-string (format "(cognitect.rebl/inspect %s)\n" (jdarb/buffer-substring-last-sexp))))
+  
   (defun reload-current-clj-ns (next-p)
     (interactive "P")
     (let ((ns (clojure-find-ns)))
-      (message (format "Loading %s ..." ns))
-      (inf-clojure-eval-string (format "(do (require '%s :reload) (in-ns '%s))" ns ns))))
+      (message (format "Loading %s..." ns))
+      (inf-clojure-eval-string (inf-clojure--forms-without-newlines (format "(do (load-file \"%s\")(in-ns '%s))" (buffer-file-name) ns)))))
 
   (defun inf-clojure-erase-buffer ()
     (interactive)
@@ -342,7 +345,7 @@
     (pcase-let ((`(,declaration-macro ,symbol-name) (clojure-find-def)))
       (let ((ns (clojure-find-ns)))
         (if (string= declaration-macro "deftest")
-            (progn (message (format "Running test %s/%s ..." ns symbol-name))
+            (progn (message (format "Running test %s/%s..." ns symbol-name))
                    (inf-clojure-eval-string (format
                                              "(do (use 'clojure.test) (clojure.test/test-vars [#'%s/%s]))"
                                              ns symbol-name ns)))
@@ -351,7 +354,7 @@
   (defun inf-clojure-run-tests-in-ns ()
     (interactive)
     (let ((ns (clojure-find-ns)))
-      (message (format "Running tests in %s ..." ns))
+      (message (format "Running tests in %s..." ns))
       (inf-clojure-eval-string (format "(do (use 'clojure.test) (run-tests '%s))" ns))))
 
   (defun inf-clojure-toggle-log-activity ()
