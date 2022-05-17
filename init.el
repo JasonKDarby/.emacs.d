@@ -86,6 +86,8 @@
 
 (global-set-key (kbd "<f6>") 'xref-find-definitions)
 
+(global-set-key (kbd "s-<backspace>") 'delete-region)
+
 (defvar tramp-default-method "ssh")
 
 ;; Default indent size to 2 spaces
