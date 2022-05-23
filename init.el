@@ -503,12 +503,14 @@
          ("<f2> i" . counsel-info-lookup-symbol)
          ("<f2> u" . counsel-unicode-char)
          ("M-y" . counsel-yank-pop)
-         ("s-s" . counsel-projectile-ag)
+         ("s-s" . counsel-projectile-rg)
 	       :map minibuffer-local-map
 	       ("C-r" . 'counsel-minibuffer-history))
   :config
   (setq ivy-initial-inputs-alist nil) ;; Don't start searches with ^
-  (setq counsel-projectile-ag-initial-input '(ivy-thing-at-point))) ;; Prefill ag with thing-at-point
+  (setq counsel-projectile-ag-initial-input '(ivy-thing-at-point)) ;; Prefill ag with thing-at-point
+  (setq counsel-projectile-rg-initial-input '(ivy-thing-at-point)) ;; Prefill rg with thing-at-point
+  )
 
 (use-package counsel-projectile
   :after projectile
