@@ -363,7 +363,7 @@
     (interactive)
     (setq inf-clojure-log-activity (not inf-clojure-log-activity)))
 
-  (when (boundp 'apply-company-specific-configuration)
+  (when (featurep 'company-specific)
     (apply-company-specific-configuration 'inf-clojure)))
 
 ;; END clojure
@@ -475,7 +475,7 @@
   (setq projectile-switch-project-action #'projectile-dired)
   :config
   (projectile-mode)
-  (when (boundp 'apply-company-specific-configuration)
+  (when (featurep 'company-specific)
     (apply-company-specific-configuration 'projectile))
   :custom ((projectile-completion-system 'ivy))
   :bind-keymap
