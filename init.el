@@ -304,6 +304,7 @@
 
 ;; See https://martintrojer.github.io/clojure/2015/02/14/clojure-and-emacs-without-cider-redux
 (use-package inf-clojure
+  :straight (inf-clojure :type git :host github :repo "JasonKDarby/inf-clojure")
   :hook ((clojure-mode . inf-clojure-minor-mode)
          ;; Prevents emacs from becoming unresponsive with giant lines.
          ;; ...But at what cost?
