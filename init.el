@@ -290,6 +290,7 @@
   (global-flycheck-mode))
 
 (use-package clojure-mode
+  :hook ((clojure-mode . linum-mode))
   :bind (
          :map clojure-mode-map
          ("\C-c\C-k" . 'reload-current-clj-ns)
@@ -314,6 +315,7 @@
          ("\C-cl" . 'inf-clojure-erase-buffer)
          ("{" . #'paredit-open-curly)
          ("}" . #'paredit-close-curly)
+         ("\C-x\s-e" . 'inf-clojure-rebl-inspect)
          :map inf-clojure-minor-mode)
   :config
   ;; This is the default, not sure why you wouldn't want it to be read-only.
@@ -350,8 +352,8 @@
         (if (string= declaration-macro "deftest")
             (progn (message (format "Running test %s/%s..." ns symbol-name))
                    (inf-clojure-eval-string (format
-                                             "(do (use 'clojure.test) (clojure.test/test-vars [#'%s/%s]))"
-                                             ns symbol-name ns)))
+                                             "(do (use 'clojure.test)(clojure.test/test-vars [#'%s/%s]))"
+                                             ns symbol-name)))
           (message (format "%s/%s was created using %s, not deftest" ns symbol-name declaration-macro))))))
   
   (defun inf-clojure-run-tests-in-ns ()
