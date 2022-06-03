@@ -337,7 +337,7 @@
     (interactive "P")
     (let ((ns (clojure-find-ns)))
       (message (format "Loading %s..." ns))
-      (inf-clojure-eval-string (inf-clojure--forms-without-newlines (format "(do (load-file \"%s\")(in-ns '%s))" (buffer-file-name) ns)))))
+      (inf-clojure-eval-string (inf-clojure--forms-without-newlines (format "(do (clojure.core/load-file \"%s\")(clojure.core/in-ns '%s))" (buffer-file-name) ns)))))
 
   (defun inf-clojure-erase-buffer ()
     (interactive)
