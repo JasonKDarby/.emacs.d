@@ -366,6 +366,10 @@
     (interactive)
     (setq inf-clojure-log-activity (not inf-clojure-log-activity)))
 
+  (defun inf-clojure-print-last-exception ()
+    (interactive)
+    (inf-clojure-eval-string "(do (use 'clojure.stacktrace) (print-stack-trace *e 5))"))
+
   (when (featurep 'company-specific)
     (apply-company-specific-configuration 'inf-clojure)))
 
