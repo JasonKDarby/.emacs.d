@@ -73,6 +73,11 @@
                (using-windowsp 130))
  :weight 'normal)
 
+;; We need to make sure the font gets evaluated per frame or frames started
+;; by emacsclient won't load the font while starting emacs directly will.
+(add-to-list 'default-frame-alist
+             '(font . "Fantasque Sans Mono"))
+
 ;; Delete selected text with what you type
 (delete-selection-mode 1)
 
