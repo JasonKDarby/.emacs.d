@@ -6,7 +6,6 @@
 ;;
 ;; Some modes require external dependencies.
 ;; - doc-view-mode https://www.emacswiki.org/emacs/DocViewMode
-;; - flycheck-clj-kondo https://github.com/borkdude/flycheck-clj-kondo
 ;;
 ;;; Code:
 
@@ -190,6 +189,10 @@
 (when using-macp
   (use-package launchctl))
 
+;; Packages to only use when using windows
+(when using-windowsp
+  (use-package powershell))
+
 (use-package csv-mode)
 
 (use-package expand-region
@@ -277,20 +280,10 @@
   (setq company-minimum-prefix-length 2)
   (setq company-idle-delay 0.2))
 
-(use-package yasnippet
-  :config
-  (yas-global-mode))
-
-(use-package yasnippet-snippets)
-
 ;; BEGIN clojure
 
-(use-package flycheck-clj-kondo
-  :config
-  (global-flycheck-mode))
-
 (use-package clojure-mode
-  :hook ((clojure-mode . linum-mode))
+  :hook ((clojure-mode . display-line-numbers-mode))
   :bind (
          :map clojure-mode-map
          ("\C-c\C-k" . 'reload-current-clj-ns)
@@ -298,10 +291,13 @@
          ("\C-c\C-tn" . 'inf-clojure-run-tests-in-ns)
          ("\C-c\C-t\C-n" . 'inf-clojure-run-tests-in-ns)
          ("\C-c\C-tt" . 'inf-clojure-run-current-test)
-         ("\C-c\C-t\C-t" . 'inf-clojure-run-current-test))
+         ("\C-c\C-t\C-t" . 'inf-clojure-run-current-test)
+         :map clojurescript-mode-map
+         ("\C-c\C-k" . 'reload-current-cljs-ns))
   :config
-  (setq clojure-indent-style 'always-align)
-  (require 'flycheck-clj-kondo))
+  (setq clojure-indent-style 'always-align))
+
+(use-package eglot)
 
 ;; See https://martintrojer.github.io/clojure/2015/02/14/clojure-and-emacs-without-cider-redux
 (use-package inf-clojure
@@ -318,6 +314,9 @@
          ("\C-x\s-e" . 'inf-clojure-rebl-inspect)
          :map inf-clojure-minor-mode)
   :config
+  ;; Make sure eglot loads automatically in clojurescript-mode
+  (add-hook 'clojurescript-mode 'eglot-ensure)
+  
   ;; This is the default, not sure why you wouldn't want it to be read-only.
   (setq inf-clojure-prompt-read-only t)
 
@@ -338,6 +337,12 @@
     (let ((ns (clojure-find-ns)))
       (message (format "Loading %s..." ns))
       (inf-clojure-eval-string (inf-clojure--forms-without-newlines (format "(do (load-file \"%s\")(in-ns '%s))" (buffer-file-name) ns)))))
+
+  (defun reload-current-cljs-ns (next-p)
+    (interactive "P")
+    (let ((ns (clojure-find-ns)))
+      (message (format "Loading %s..." ns))
+      (inf-clojure-eval-string (inf-clojure--forms-without-newlines (format "(in-ns '%s)" ns)))))
 
   (defun inf-clojure-erase-buffer ()
     (interactive)
