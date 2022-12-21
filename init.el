@@ -251,15 +251,15 @@
 (use-package diminish)
 
 (use-package paredit
-  :hook ((clojure-mode . paredit-mode)
-         (clojurescript-mode . paredit-mode)
-         (emacs-lisp-mode . paredit-mode)
-         (lisp-mode . paredit-mode)
-         (lisp-interaction-mode . paredit-mode)
-         (scheme-mode . paredit-mode)
-         (inf-clojure-mode . paredit-mode)
+  :hook ((clojure-mode           . paredit-mode)
+         (clojurescript-mode     . paredit-mode)
+         (emacs-lisp-mode        . paredit-mode)
+         (lisp-mode              . paredit-mode)
+         (lisp-interaction-mode  . paredit-mode)
+         (scheme-mode            . paredit-mode)
+         (inf-clojure-mode       . paredit-mode)
          (inf-clojure-minor-mode . paredit-mode)
-         (lisp-data-mode . paredit-mode))
+         (lisp-data-mode         . paredit-mode))
   :config
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
   (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
@@ -286,14 +286,14 @@
   :hook ((clojure-mode . display-line-numbers-mode))
   :bind (
          :map clojure-mode-map
-         ("\C-c\C-k" . 'reload-current-clj-ns)
-         ("\C-cl" . 'inf-clojure-erase-buffer)
-         ("\C-c\C-tn" . 'inf-clojure-run-tests-in-ns)
+         ("\C-c\C-k"     . 'reload-current-clj-ns)
+         ("\C-cl"        . 'inf-clojure-erase-buffer)
+         ("\C-c\C-tn"    . 'inf-clojure-run-tests-in-ns)
          ("\C-c\C-t\C-n" . 'inf-clojure-run-tests-in-ns)
          ("\C-c\C-tt" . 'inf-clojure-run-current-test)
          ("\C-c\C-t\C-t" . 'inf-clojure-run-current-test)
          :map clojurescript-mode-map
-         ("\C-c\C-k" . 'reload-current-cljs-ns))
+         ("\C-c\C-k" . 'reload-current-cljs-ns)))
   :config
   (setq clojure-indent-style 'always-align))
 
@@ -308,9 +308,9 @@
          (inf-clojure-mode . visual-line-mode))
   :bind (
          :map inf-clojure-mode-map
-         ("\C-cl" . 'inf-clojure-erase-buffer)
-         ("{" . #'paredit-open-curly)
-         ("}" . #'paredit-close-curly)
+         ("\C-cl"    . 'inf-clojure-erase-buffer)
+         ("{"        . #'paredit-open-curly)
+         ("}"        . #'paredit-close-curly)
          ("\C-x\s-e" . 'inf-clojure-rebl-inspect)
          :map inf-clojure-minor-mode)
   :config
@@ -336,7 +336,7 @@
     (interactive "P")
     (let ((ns (clojure-find-ns)))
       (message (format "Loading %s..." ns))
-      (inf-clojure-eval-string (inf-clojure--forms-without-newlines (format "(do (load-file \"%s\")(in-ns '%s))" (buffer-file-name) ns)))))
+      (inf-clojure-eval-string (inf-clojure--forms-without-newlines (format "(do (clojure.core/load-file \"%s\")(clojure.core/in-ns '%s))" (buffer-file-name) ns)))))
 
   (defun reload-current-cljs-ns (next-p)
     (interactive "P")
@@ -371,6 +371,10 @@
     (interactive)
     (setq inf-clojure-log-activity (not inf-clojure-log-activity)))
 
+  (defun inf-clojure-print-last-exception ()
+    (interactive)
+    (inf-clojure-eval-string "(do (use 'clojure.stacktrace) (print-stack-trace *e 5))"))
+
   (when (featurep 'company-specific)
     (apply-company-specific-configuration 'inf-clojure)))
 
@@ -392,9 +396,9 @@
             ("C-c <tab>" . json-mode-beautify)))
 
 (use-package rainbow-delimiters
-  :hook ((clojure-mode . rainbow-delimiters-mode)
-         (inf-clojure-mode . rainbow-delimiters-mode)
-         (emacs-lisp-mode . rainbow-delimiters-mode)
+  :hook ((clojure-mode                     . rainbow-delimiters-mode)
+         (inf-clojure-mode                 . rainbow-delimiters-mode)
+         (emacs-lisp-mode                  . rainbow-delimiters-mode)
          (eval-expression-minibuffer-setup . rainbow-delimiters-mode)))
 
 (use-package magit
@@ -437,7 +441,7 @@
   :demand t
   ;; TODO: running these commands results in with-editor trying to be invoked as a function but is void
   :bind (([remap async-shell-command] . 'with-editor-async-shell-command)
-         ([remap shell-command] . 'with-editor-shell-command)))
+         ([remap shell-command]       . 'with-editor-shell-command)))
 
 (use-package eshell-git-prompt)
 
@@ -491,28 +495,28 @@
 
 (use-package counsel
   :demand t
-  :bind (("M-x" . counsel-M-x)
-	       ("C-x b" . counsel-ibuffer)
-	       ("C-x C-f" . counsel-find-file)
+  :bind (("M-x"                 . counsel-M-x)
+	       ("C-x b"               . counsel-ibuffer)
+	       ("C-x C-f"             . counsel-find-file)
          ([remap bookmark-jump] . counsel-bookmark)
-	       ("C-M-j" . counsel-switch-buffer)
-	       ("C-M-l" . counsel-imenu)
-         ("C-c g" . counsel-git)
-         ("C-c j" . counsel-git-grep)
-         ("C-c k" . counsel-ag)
-         ("C-x l" . counsel-locate)
-         ("C-S-o" . counsel-rythmbox)
-         ("<f6>" . ivy-resume)
-         ("<f1> f" . counsel-describe-function)
-         ("<f1> v" . counsel-describe-variable)
-         ("<f1> o" . counsel-describe-symbol)
-         ("<f1> l" . counsel-find-library)
-         ("<f2> i" . counsel-info-lookup-symbol)
-         ("<f2> u" . counsel-unicode-char)
-         ("M-y" . counsel-yank-pop)
-         ("s-s" . counsel-projectile-rg)
+	       ("C-M-j"               . counsel-switch-buffer)
+	       ("C-M-l"               . counsel-imenu)
+         ("C-c g"               . counsel-git)
+         ("C-c j"               . counsel-git-grep)
+         ("C-c k"               . counsel-ag)
+         ("C-x l"               . counsel-locate)
+         ("C-S-o"               . counsel-rythmbox)
+         ("<f6>"                . ivy-resume)
+         ("<f1> f"              . counsel-describe-function)
+         ("<f1> v"              . counsel-describe-variable)
+         ("<f1> o"              . counsel-describe-symbol)
+         ("<f1> l"              . counsel-find-library)
+         ("<f2> i"              . counsel-info-lookup-symbol)
+         ("<f2> u"              . counsel-unicode-char)
+         ("M-y"                 . counsel-yank-pop)
+         ("s-s"                 . counsel-projectile-rg)
 	       :map minibuffer-local-map
-	       ("C-r" . 'counsel-minibuffer-history))
+	       ("C-r"                 . 'counsel-minibuffer-history))
   :config
   (setq ivy-initial-inputs-alist nil) ;; Don't start searches with ^
   (setq counsel-projectile-ag-initial-input '(ivy-thing-at-point)) ;; Prefill ag with thing-at-point
@@ -531,13 +535,13 @@
   (counsel-describe-variable-function #'helpful-variable)
   :bind
   ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
+  ([remap describe-command]  . helpful-command)
   ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
+  ([remap describe-key]      . helpful-key))
 
 (use-package aggressive-indent
-  :hook ((emacs-lisp-mode . aggressive-indent-mode)
-         (clojure-mode . aggressive-indent-mode)
+  :hook ((emacs-lisp-mode  . aggressive-indent-mode)
+         (clojure-mode     . aggressive-indent-mode)
          (inf-clojure-mode . aggressive-indent-mode))
   :config
   ;; A temporary fix to prevent messages from being logged to the buffer as of Emacs 28.
