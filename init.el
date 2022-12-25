@@ -293,7 +293,7 @@
          ("\C-c\C-tt" . 'inf-clojure-run-current-test)
          ("\C-c\C-t\C-t" . 'inf-clojure-run-current-test)
          :map clojurescript-mode-map
-         ("\C-c\C-k" . 'reload-current-cljs-ns)))
+         ("\C-c\C-k" . 'reload-current-cljs-ns))
   :config
   (setq clojure-indent-style 'always-align))
 
