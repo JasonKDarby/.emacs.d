@@ -21,11 +21,15 @@
 ;; Note my keybinds are meant for the Kinesis Advantage 2.
 
 (when using-macp
-  (setq mac-command-modifier 'control
-        mac-option-modifier      'meta
-        mac-right-option-modifier 'hyper
-        mac-right-command-modifier 'super
-        mac-control-modifier 'hyper))
+  (progn
+    (setq mac-command-modifier 'control
+          mac-option-modifier      'meta
+          mac-right-option-modifier 'hyper
+          mac-right-command-modifier 'super
+          mac-control-modifier 'hyper)
+    ;; https://www.reddit.com/r/emacs/comments/xfhnzz/weird_errors_with_latest_build_of_emacs/
+    ;; This can probably be removed in a future emacs upgrade
+    (customize-set-variable 'native-comp-driver-options '("-Wl,-w"))))
 
 (when using-windowsp
   (setq w32-rwindow-modifier 'hyper)
