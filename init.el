@@ -291,6 +291,8 @@
          (inf-clojure-mode       . paredit-mode)
          (inf-clojure-minor-mode . paredit-mode)
          (lisp-data-mode         . paredit-mode))
+  :bind (:map paredit-mode-map
+              ("RET" . nil))
   :config
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
   (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
