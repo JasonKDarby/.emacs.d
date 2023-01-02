@@ -109,3 +109,5 @@ company-specific.el
 hackernews/
 eln-cache/
 projects
+url/
+org-persist/
