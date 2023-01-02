@@ -65,6 +65,9 @@
 ;; Turn off line numberscount
 (global-display-line-numbers-mode 0)
 
+;; Always highlight the current line.  This is only marginally useful for me but is immensely useful for viewers when screen sharing.
+(global-hl-line-mode)
+
 ;; Hey, it's a nice looking font
 (set-face-attribute
  'default nil
@@ -188,6 +191,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Package configuration
 
+;; Provides useful elisp functions, primarily a dependency for other packages.
 (use-package dash)
 
 ;; Packages to only use when using macos
@@ -563,6 +567,10 @@
   :config
   (setq whitespace-style '(face empty tabs lines-trail trailing))
   (global-whitespace-mode 0))
+
+;; Shows whitespace at the end of lines.
+;; It's real uggo so don't leave trailing whitespace.
+(setq-default show-trailing-whitespace t)
 
 (use-package which-key
   :bind
