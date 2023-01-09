@@ -330,8 +330,6 @@
   :config
   (setq clojure-indent-style 'always-align))
 
-(use-package eglot)
-
 ;; See https://martintrojer.github.io/clojure/2015/02/14/clojure-and-emacs-without-cider-redux
 (use-package inf-clojure
   :straight (inf-clojure :type git :host github :repo "JasonKDarby/inf-clojure")
@@ -347,16 +345,18 @@
          ("\C-x\s-e" . 'inf-clojure-rebl-inspect)
          :map inf-clojure-minor-mode)
   :config
-  ;; Make sure eglot loads automatically in clojurescript-mode
-  (add-hook 'clojurescript-mode 'eglot-ensure)
-  
   ;; This is the default, not sure why you wouldn't want it to be read-only.
   (setq inf-clojure-prompt-read-only t)
 
+  ;; Let eglot handle this
+  (setq inf-clojure-enable-eldoc nil)
+
   ;; Use compliment https://github.com/alexander-yakushev/compliment for clojure completions
+  ;; Eglot provides completions in clojure/clojurec/clojurescript modes but this is needed for repl completions.
   (inf-clojure-update-feature 'clojure 'completion "(compliment.core/completions \"%s\")")
 
-  (inf-clojure-update-feature 'clojure 'arglists "(try (:arglists (clojure.core/meta (clojure.core/resolve (clojure.core/read-string \"%s\")))) (catch Throwable t nil))")
+  ;; Make this cljs compatible for when I use a repl that upgrades to cljs
+  (inf-clojure-update-feature 'clojure 'arglists "try (-> (symbol \"%s\" #?(:clj (->> str clojure.core/read-string clojure.core/resolve clojure.core/meta :arglists) :cljs (->> cljs.core/resolve cljs.core/meta :arglists))) #?(:clj (catch Throwable _ nil) :cljs (catch :default _ nil)))")
 
   (defun jdarb/buffer-substring-last-sexp ()
     (buffer-substring-no-properties (save-excursion (backward-sexp) (point)) (point)))
@@ -410,6 +410,18 @@
 
   (when (featurep 'company-specific)
     (apply-company-specific-configuration 'inf-clojure)))
+
+(use-package eglot
+  :ensure t
+  :config
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+                 '(inf-clojure-mode . ("clojure-lsp"))))
+  
+  ;; Make sure eglot loads automatically in clojurescript-mode
+  (add-hook 'clojurescript-mode-hook 'eglot-ensure)
+  (add-hook 'clojurec-mode-hook 'eglot-ensure)
+  (add-hook 'clojure-mode-hook 'eglot-ensure))
 
 ;; END clojure
 
@@ -573,9 +585,12 @@
   ([remap describe-key]      . helpful-key))
 
 (use-package aggressive-indent
-  :hook ((emacs-lisp-mode  . aggressive-indent-mode)
-         (clojure-mode     . aggressive-indent-mode)
-         (inf-clojure-mode . aggressive-indent-mode))
+  :hook ((emacs-lisp-mode    . aggressive-indent-mode)
+         (clojure-mode       . aggressive-indent-mode)
+         (clojure-mode       . aggressive-indent-mode)
+         (clojurec-mode      . aggressive-indent-mode)
+         (clojurescript-mode . aggressive-indent-mode)
+         (inf-clojure-mode   . aggressive-indent-mode))
   :config
   ;; A temporary fix to prevent messages from being logged to the buffer as of Emacs 28.
   ;; See https://github.com/Malabarba/aggressive-indent-mode/pull/148
