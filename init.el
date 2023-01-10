@@ -303,7 +303,8 @@
   (indent-guide-global-mode))
 
 (use-package company
-  :hook (prog-mode . company-mode)
+  :hook ((prog-mode . company-mode)
+         (inf-clojure-mode . company-mode))
   :bind (("<backtab>" . company-complete-common))
   :config
   ;; Makes autocomplete return uppercase if the completion calls for it
