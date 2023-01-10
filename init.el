@@ -356,7 +356,7 @@
   (inf-clojure-update-feature 'clojure 'completion "(compliment.core/completions \"%s\")")
 
   ;; Make this cljs compatible for when I use a repl that upgrades to cljs
-  (inf-clojure-update-feature 'clojure 'arglists "try (-> (symbol \"%s\" #?(:clj (->> str clojure.core/read-string clojure.core/resolve clojure.core/meta :arglists) :cljs (->> cljs.core/resolve cljs.core/meta :arglists))) #?(:clj (catch Throwable _ nil) :cljs (catch :default _ nil)))")
+  (inf-clojure-update-feature 'clojure 'arglists "(try (-> (symbol \"%s\" #?(:clj (->> str clojure.core/read-string clojure.core/resolve clojure.core/meta :arglists) :cljs (->> cljs.core/resolve cljs.core/meta :arglists))) #?(:clj (catch Throwable _ nil) :cljs (catch :default _ nil))))")
 
   (defun jdarb/buffer-substring-last-sexp ()
     (buffer-substring-no-properties (save-excursion (backward-sexp) (point)) (point)))
