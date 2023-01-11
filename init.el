@@ -88,6 +88,9 @@
 ;; Delete selected text with what you type
 (delete-selection-mode 1)
 
+;; Space between lines
+(setq line-spacing 0.2)
+
 ;; Make ESC quit prompts
 ;; (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 ;; This is on probation to break habits of escaping windows
@@ -148,11 +151,16 @@
 (setq read-minibuffer-restore-windows nil)
 
 ;; Useful functions
-(defun remove-dos-eol ()
+(defun jdarb/remove-dos-eol ()
   "Do not show ^M in files containing mixed UNIX and DOS line endings."
   (interactive)
   (setq buffer-display-table (make-display-table))
   (aset buffer-display-table ?\^M []))
+
+(defun jdarb/change-theme (theme)
+  (if (eq (car custom-enabled-themes) theme)
+      (disable-theme theme)
+    (enable-theme theme)))
 
 ;; put auto generated custom information into a separate file
 (setq custom-file "~/.emacs.d/custom.el")
@@ -229,11 +237,21 @@
 
 ;; THEMES - I am fickle
 ;; See visualizations at https://github.com/doomemacs/themes/tree/screenshots
+;; favorites:
+;; base16-chalk
+;; doom-city-lights
+;; doom-miramare
+;; gruvbox
+;; doom-moonlight
+;; base16-bespin
+;; base16-eighties
+;; base16-mocha
+;; doom-peacock
 (use-package doom-themes)
 
 (use-package gruvbox-theme
   :config
-  (load-theme 'gruvbox t))
+  (load-theme 'gruvbox-light-medium t))
 
 ;; See visualizations at https://belak.github.io/base16-emacs/
 (use-package base16-theme)
