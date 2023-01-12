@@ -264,9 +264,11 @@
   :defer t
   :init
   (setq dired-filter-group-saved-groups '(("default"
-                                           ("Directories"
+                                           ("emacs"
+                                            (extension "el"))
+                                           ("directories"
                                             (directory))
-                                           ("Clojure"
+                                           ("clojure"
                                             (extension "clj" "cljs" "cljc" "edn")))))
   :hook ((dired-mode . dired-filter-group-mode))
   :custom
@@ -409,12 +411,36 @@
     (interactive)
     (inf-clojure-eval-string "(do (use 'clojure.stacktrace) (print-stack-trace *e 5))"))
 
+  (alist-get 'apropos (alist-get 'combined-clj-cljs inf-clojure-repl-features))
+  
+  (let ((clojure-repl-features (alist-get 'clojure inf-clojure-repl-features))
+        (cljs-repl-features (alist-get 'cljs inf-clojure-repl-features)))
+    (add-to-list 'inf-clojure-repl-features
+                 `(combined-clj-cljs . ((doc . "(-> '%s #?(:default clojure.repl/doc :cljs cljs.repl/doc))")
+                                        (source . "(-> '%s #?(:clj clojure.repl/source :cljs cljs.repl/source))")
+                                        (arglists . "(try (-> (symbol \"%s\") #?(:clj (->> str clojure.core/read-string clojure.core/resolve clojure.core/meta :arglists) :cljs (->> cljs.core/resolve cljs.core/meta :arglists))) #?(:clj (catch Throwable _ nil) :cljs (catch :default _ nil)))")
+                                        (apropos  . ,(concat "(let [inf-clojure-dummy-val (str %s)] #?(:clj "
+                                                             (string-replace "\"%s\"" "inf-clojure-dummy-val" (alist-get 'apropos clojure-repl-features))
+                                                             " :cljs "
+                                                             (string-replace "\"%s\"" "inf-clojure-dummy-val" (alist-get 'apropos cljs-repl-features))
+                                                             ")"))
+                                        (ns-vars . "(-> %s #?(:clj clojure.repl/dir :cljs cljs.repl/dir))")
+                                        (set-ns . "(in-ns '%s)")
+                                        (macroexpand . "(-> '%s #?(:clj clojure.core/macroexpand :cljs cljs.core/macroexpand))")
+                                        (macroexpand-1 . "(-> '%s #?(:clj clojure.core/macroexpand-1 :cljs cljs.core/macroexpand-1))"))))
+
+    ;; It should be possible to get cljs completion via suitable depending on project setup but dependably enough to set it by default.
+    (inf-clojure-update-feature 'combined-clj-cljs 'completion "#?(:clj (compliment.core/completions \"%s\") :cljs nil)"))
+
   (when (featurep 'company-specific)
     (apply-company-specific-configuration 'inf-clojure)))
 
 (use-package eglot
   :ensure t
+  :bind (("C-S-<tab>" . 'eglot-code-actions))
   :config
+  (setq eglot-confirm-server-initiated-edits nil)
+  
   (with-eval-after-load 'eglot
     (add-to-list 'eglot-server-programs
                  '(inf-clojure-mode . ("clojure-lsp"))))
