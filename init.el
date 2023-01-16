@@ -372,7 +372,9 @@
     (interactive "P")
     (let ((ns (clojure-find-ns)))
       (message (format "Loading %s..." ns))
-      (inf-clojure-eval-string (inf-clojure--forms-without-newlines (format "(do (clojure.core/load-file \"%s\")(clojure.core/in-ns '%s))" (buffer-file-name) ns)))))
+      (inf-clojure-eval-string
+       (inf-clojure--forms-without-newlines
+        (format "(do(use '[clojure.tools.namespace.repl :only (refresh)])(refresh)(in-ns '%s))" ns)))))
 
   (defun reload-current-cljs-ns (next-p)
     (interactive "P")
