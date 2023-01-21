@@ -374,7 +374,7 @@
       (message (format "Loading %s..." ns))
       (inf-clojure-eval-string
        (inf-clojure--forms-without-newlines
-        (format "(do(use '[clojure.tools.namespace.repl :only (refresh)])(refresh)(in-ns '%s))" ns)))))
+        (format "(do (use '[clojure.tools.namespace.repl :only (refresh)])(refresh)(in-ns '%s))" ns)))))
 
   (defun reload-current-cljs-ns (next-p)
     (interactive "P")
@@ -418,9 +418,9 @@
   (let ((clojure-repl-features (alist-get 'clojure inf-clojure-repl-features))
         (cljs-repl-features (alist-get 'cljs inf-clojure-repl-features)))
     (add-to-list 'inf-clojure-repl-features
-                 `(combined-clj-cljs . ((doc . "(-> '%s #?(:default clojure.repl/doc :cljs cljs.repl/doc))")
-                                        (source . "(-> '%s #?(:clj clojure.repl/source :cljs cljs.repl/source))")
-                                        (arglists . "(try (-> (symbol \"%s\") #?(:clj (->> str clojure.core/read-string clojure.core/resolve clojure.core/meta :arglists) :cljs (->> cljs.core/resolve cljs.core/meta :arglists))) #?(:clj (catch Throwable _ nil) :cljs (catch :default _ nil)))")
+                 `(combined-clj-cljs . ((doc . "(-> %s #?(:default clojure.repl/doc :cljs cljs.repl/doc))")
+                                        (source . "(-> %s #?(:clj clojure.repl/source :cljs cljs.repl/source))")
+                                        (arglists . "(try (-> '%s #?(:clj (->> str clojure.core/read-string clojure.core/resolve clojure.core/meta :arglists) :cljs (->> cljs.core/resolve cljs.core/meta :arglists))) #?(:clj (catch Throwable _ nil) :cljs (catch :default _ nil)))")
                                         (apropos  . ,(concat "(let [inf-clojure-dummy-val (str %s)] #?(:clj "
                                                              (string-replace "\"%s\"" "inf-clojure-dummy-val" (alist-get 'apropos clojure-repl-features))
                                                              " :cljs "
